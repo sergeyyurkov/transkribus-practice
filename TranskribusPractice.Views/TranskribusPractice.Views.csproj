@@ -52,7 +52,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Design\ExampleViewModel.cs" />
+    <Compile Include="Design\DesingViewModel.cs" />
+    <Compile Include="Design\RectangleColorConverter.cs" />
+    <Compile Include="Design\RectangleRegionTemplateSelector.cs" />
+    <Compile Include="Design\RectangleVisibilityConverter.cs" />
     <Compile Include="ExampleView.xaml.cs">
       <DependentUpon>ExampleView.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -82,6 +85,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TranskribusPractice.BusinessDomain\TranskribusPractice.BusinessDomain.csproj">
+      <Project>{f82c6792-7ca9-4d36-9762-65995bfd79cc}</Project>
+      <Name>TranskribusPractice.BusinessDomain</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TranskribusPractice.ViewModels\TranskribusPractice.ViewModels.csproj">
       <Project>{4655ad4c-363e-461b-b782-075e58d52884}</Project>
       <Name>TranskribusPractice.ViewModels</Name>

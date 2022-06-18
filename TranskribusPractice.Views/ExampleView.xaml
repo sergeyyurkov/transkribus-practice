@@ -5,15 +5,161 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TranskribusPractice.Views"
              xmlns:design="clr-namespace:TranskribusPractice.Views.Design"
+             xmlns:area="clr-namespace:TranskribusPractice.BusinessDomain.AreaConcept;assembly=TranskribusPractice.BusinessDomain"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance design:ExampleViewModel, IsDesignTimeCreatable=True}">
-    <Grid Margin="4">
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Label Content="{Binding Text}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <Button Grid.Row="1" Content="Save" Command="{Binding SaveCommand}" HorizontalAlignment="Center" Margin="4"/>
-    </Grid>
+             d:DataContext="{d:DesignInstance design:DesingViewModel, IsDesignTimeCreatable=True}">
+    <UserControl.Resources>
+        <design:RectangleRegionTemplateSelector x:Key="rectangleRegionTemplateSelector"/>
+        <design:RectangleColorConverter x:Key="rectangleColorConverter"/>
+        <design:RectangleVisibilityConverter x:Key="rectangleVisibilityConverter"/>
+        <DataTemplate  x:Key="Word">
+            <TextBlock Text="{Binding Name}" />
+        </DataTemplate>
+        <HierarchicalDataTemplate x:Key="Line"
+            ItemsSource="{Binding Path=Words}"
+            ItemTemplate="{StaticResource Word}">
+            <TextBlock Text="{Binding Name}" />
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate x:Key="Text"
+            ItemsSource="{Binding Path=Lines}"
+            ItemTemplate="{StaticResource Line}">
+            <TextBlock Text="{Binding Name}" />
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate x:Key="level1"
+            ItemsSource="{Binding Path=TextRegions}"
+            ItemTemplate="{StaticResource Text}">
+            <TextBlock Text="{Binding Name}" />
+        </HierarchicalDataTemplate>
+        <!-- -->
+        <Style TargetType="Border" x:Key="RectangleChosenBorder">
+            <d:Style.DataContext>
+                <x:Type Type="local:MainWindow"/>
+            </d:Style.DataContext>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}, Path=(Grid.IsMouseOver)}" Value="True">
+                    <Setter  Property="Border.BorderThickness" Value="4"/>
+                    <Setter  Property="Border.BorderBrush" Value="Black"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <DataTemplate x:Key="TextTemplate" DataType="{x:Type area:TextRegion}">
+            <Grid Background="Transparent">
+                <Rectangle
+                Width="{Binding Width}"
+                Height="{Binding Height}"
+                Opacity="0.5" Fill="Red"/>
+                <Border Name="border" Style="{StaticResource RectangleChosenBorder}"/>
+                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4"/>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="LineTemplate" DataType="{x:Type area:LineRegion}">
+            <Grid Background="Transparent">
+                <Rectangle
+                Width="{Binding Width}"
+                Height="{Binding Height}"
+                Opacity="0.5" Fill="Blue"/>
+                <Border Name="border"  Style="{StaticResource RectangleChosenBorder}"/>
+                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4"/>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="WordTemplate" DataType="{x:Type area:WordRegion}">
+            <Grid  Background="Transparent">
+                <Rectangle
+                Width="{Binding Width}"
+                Height="{Binding Height}"
+                Opacity="0.5" Fill="Green"/>
+                <Border Name="border" Style="{StaticResource RectangleChosenBorder}"/>
+                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4"/>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+    <DockPanel>
+        <DockPanel DockPanel.Dock="Top">
+            <Menu>
+                <MenuItem Header="Project">
+                    <MenuItem Header="New" />
+                    <MenuItem Header="Open" Command="{Binding OpenFileCommand}" />
+                    <MenuItem Header="Save" />
+                    <MenuItem Header="Save as" />
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+        <StackPanel DockPanel.Dock="Left">
+            <ItemsControl VerticalAlignment="Top">
+                <ItemsControl.ItemContainerStyle>
+                    <Style>
+                        <Setter Property="FrameworkElement.Margin" Value="5"/>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                <RadioButton Content="Text" Command="{Binding SetTextRegionModeCommand}" IsChecked="True" Style="{StaticResource {x:Type ToggleButton}}"/>
+                <RadioButton Content="Line" Command="{Binding SetLineRegionModeCommand}" Style="{StaticResource {x:Type ToggleButton}}"/>
+                <RadioButton Content="Word" Command="{Binding SetWordRegionModeCommand}" Style="{StaticResource {x:Type ToggleButton}}"/>
+                <RadioButton Content="Selection" Command="{Binding SetWordRegionModeCommand}" Style="{StaticResource {x:Type ToggleButton}}"/>
+            </ItemsControl>
+        </StackPanel>
+        <DockPanel DockPanel.Dock="Left">
+            <TreeView ItemsSource="{Binding TextRegions}" ItemTemplate="{StaticResource Text}"/>
+        </DockPanel>
+        <Grid Background="Gray">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <Grid Background="Transparent"
+                      PreviewMouseDown="ImageArea_MouseDown" 
+                      MouseMove="ImageArea_MouseMove" 
+                      MouseUp="ImageArea_MouseUp">
+                    <Image x:Name="Image" Source="{Binding Path=JpgPath}"/>
+                    <Canvas x:Name="ImageArea">
+                        <Rectangle x:Name="RectangleUI"
+                                   StrokeThickness="2"    
+                                   Width="{Binding  RectangleWidth}"
+                                   Height="{Binding RectangleHeight}"
+                                   Fill="{Binding Mode, Converter={StaticResource rectangleColorConverter}}"
+                                   Stroke="Black"
+                                   Visibility="{Binding RectangleVisibility, Converter={StaticResource rectangleVisibilityConverter}}"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Top"
+                                   Opacity="0.5">
+                            <Rectangle.Style>
+                                <Style>
+                                    <Setter Property="Canvas.Left" Value="{Binding RectangleCanvasLeft}"/>
+                                    <Setter Property="Canvas.Top" Value="{Binding  RectangleCanvasTop}"/>
+                                </Style>
+                            </Rectangle.Style>
+                        </Rectangle>
+                    </Canvas>
+                    <ListBox Background="Transparent" ItemsSource="{Binding AllRegions}" ItemTemplateSelector="{StaticResource rectangleRegionTemplateSelector}">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListBoxItem}">
+                                <Setter Property="Canvas.Left" Value="{Binding Path=X}"/>
+                                <Setter Property="Canvas.Top" Value="{Binding Path=Y}"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas IsItemsHost="True" Background="Transparent"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                </Grid>
+            </ScrollViewer>
+            <TextBox FontSize="16" Grid.Column="0" Grid.Row="2" Text="{Binding SelectedRectangle.Content}"/>
+            <RichTextBox x:Name="richTB" FontSize="16"  Grid.Column="1" Grid.RowSpan="2">
+                <FlowDocument >
+                    <Paragraph Name="myParagraph" >
+                        <Run Text="{Binding TextLeft}"/>
+                        <Run FontWeight="Bold" Text="{Binding TextSelected}"/>
+                        <Run Text="{Binding TextRight}"/>
+                    </Paragraph>
+                </FlowDocument>
+            </RichTextBox>
+        </Grid>
+    </DockPanel>
 </UserControl>

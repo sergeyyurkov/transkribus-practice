@@ -20,9 +20,36 @@ namespace TranskribusPractice.Views
     /// </summary>
     public partial class ExampleView : UserControl
     {
+        private ViewModels.IMouseAware _mouseAware;
         public ExampleView()
         {
             InitializeComponent();
+        }
+        //called in startup project after this datacontext has been changed
+        public void UpdateInfo()
+        {
+            _mouseAware = this.DataContext as ViewModels.IMouseAware;
+        } 
+        public void ImageArea_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var mouseAware = _mouseAware;
+            if (mouseAware is null) return;
+            var mousePosition = e.GetPosition(ImageArea);
+            _mouseAware.RectangleMouseDown(mousePosition.X, mousePosition.Y);
+        }
+        public void ImageArea_MouseMove(object sender, MouseEventArgs e)
+        {
+            var mouseAware = _mouseAware;
+            if (mouseAware is null) return;
+            var mousePosition = e.GetPosition(ImageArea);
+            _mouseAware.RectangleMouseMove(mousePosition.X, mousePosition.Y);
+        }
+        public void ImageArea_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            var mouseAware = _mouseAware;
+            if (mouseAware is null) return;
+            var mousePosition = e.GetPosition(ImageArea);
+            _mouseAware.RectangleMouseUp(mousePosition.X, mousePosition.Y);
         }
     }
 }
