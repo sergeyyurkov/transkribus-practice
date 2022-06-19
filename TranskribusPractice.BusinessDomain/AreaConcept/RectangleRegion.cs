@@ -6,14 +6,10 @@ using System.Text;
 
 namespace TranskribusPractice.BusinessDomain.AreaConcept 
 {
-    public abstract class RectangleRegion : INotifyPropertyChanged
+    public class RectangleRegion : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
         private string _name;
+        public event PropertyChangedEventHandler PropertyChanged;
         public string Name
         {
             get
@@ -31,5 +27,13 @@ namespace TranskribusPractice.BusinessDomain.AreaConcept
         public double Y { get; set; }
         public double Width { get; set; }
         public double Height { get; set; }
+        protected void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        public double CalculateArea()
+        {
+            return Width * Height;
+        }
     }
 }

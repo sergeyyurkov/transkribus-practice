@@ -14,13 +14,8 @@ namespace TranskribusPractice.ViewModels.Implementations
         private double _rectangleCanvasLeft;
         private double _rectangleCanvasTop;
         private bool _rectangleVisibility;
-        private TextRegion _mouseDownTextRegion;
-        private LineRegion _mouseDownLineRegion;
-        private TextRegion _mouseUpTextRegion;
-        private LineRegion _mouseUpLineRegion;
         private Region _mode = Region.Text;
         private RectangleRegion _selectedRectangle;
-        public bool IsStartedDrawing { get; set; }
         public override double RectangleWidth
         {
             get => _rectangleWidth;
@@ -105,8 +100,7 @@ namespace TranskribusPractice.ViewModels.Implementations
         public bool IsSmallRectangle()
         {
             // TODO SystemParameters.MinimumHorizontalDragDistance 
-            if (RectangleWidth <= 4
-                  || RectangleHeight <= 4)
+            if (RectangleWidth <= 4 || RectangleHeight <= 4)
             {
                 return true;
             }
@@ -144,119 +138,152 @@ namespace TranskribusPractice.ViewModels.Implementations
                             break;
                         }
                     }
-                    break; // TODO delete break and check if two rectangles or more
+                    break;
                 }
             }
         }
-        private TextRegion FindTextRegion(double x, double y)
+        public RectangleRegion DefineParent(RectangleRegion child, IEnumerable<RectangleRegion> parents)
         {
-            foreach (var text in TextRegions)
+            double parentArea = 0;
+            RectangleRegion parent = null;
+            foreach (var rect in parents)
             {
-                if (IsInRectangle(x, y, text))
+                if (IsIntersect(rect, child))
                 {
-                    return text;
-                }
-            }
-            return null;
-        }
-        private LineRegion FindLineRegion(double x, double y, TextRegion text)
-        {
-            if (!(text is null))
-            {
-                foreach (var line in text.Lines)
-                {
-                    if (IsInRectangle(x, y, line))
+                    RectangleRegion intersectedRectangle = CreateIntersectedRect(rect, child);
+                    double area = intersectedRectangle.CalculateArea();
+                    if (parentArea < area)
                     {
-                        return line;
+                        parent = rect;
+                        parentArea = area;
                     }
                 }
             }
-            return null;
+            return parent;
         }
-        //TODO refactor
-        private void FindParentRectangleMouseDown(double x, double y)
+        public TextRegion DefineParentText()
         {
-            if (Mode != Region.Text)
+            RectangleRegion line = new RectangleRegion()
             {
-                _mouseDownTextRegion = FindTextRegion(x, y);
-            }
-            if (Mode == Region.Word)
+                X = RectangleCanvasLeft,
+                Y = RectangleCanvasTop,
+                Width = RectangleWidth,
+                Height = RectangleHeight
+            };
+            double parentTextArea = 0;
+            TextRegion parentText = null;
+            foreach (var text in TextRegions)
             {
-                _mouseDownLineRegion = FindLineRegion(x, y, _mouseDownTextRegion);
+                if (IsIntersect(text, line))
+                {
+                    RectangleRegion intersectedRectangle = CreateIntersectedRect(text, line);
+                    double textArea = intersectedRectangle.CalculateArea();
+                    if (parentTextArea < textArea)
+                    {
+                        parentText = text;
+                        parentTextArea = textArea;
+                    }
+                }
             }
+            return parentText;
         }
-        //TODO refactor
-        private void FindParentRectangleMouseUp(double x, double y)
+        public LineRegion DefineParentLine() 
         {
-            if (Mode != Region.Text)
+            RectangleRegion word = new RectangleRegion()
             {
-                _mouseUpTextRegion = FindTextRegion(x, y);
-            }
-            if (Mode == Region.Word)
+                X = RectangleCanvasLeft,
+                Y = RectangleCanvasTop,
+                Width = RectangleWidth,
+                Height = RectangleHeight
+            };
+            double parentLineArea = 0;
+            LineRegion parentLine = null;
+            foreach (var text in TextRegions)
             {
-                _mouseUpLineRegion = FindLineRegion(x, y, _mouseUpTextRegion);
+                foreach(var line in text.Lines) 
+                {
+                    if (IsIntersect(line, word))
+                    {
+                        RectangleRegion intersectedRectangle = CreateIntersectedRect(line, word);
+                        double lineArea = intersectedRectangle.CalculateArea();
+                        if (parentLineArea < lineArea)
+                        {
+                            parentLine = line;
+                            parentLineArea = lineArea;
+                        }
+                    }
+                }
             }
+            return parentLine;
         }
-        //TODO change completely
-        private LineRegion DefineParentRectangle(double x, double y)
+        private RectangleRegion CreateIntersectedRect(RectangleRegion rect1, RectangleRegion rect2)
         {
-            LineRegion ParentLineRegion = _mouseDownLineRegion;
-            if (_mouseDownLineRegion == _mouseUpLineRegion)
+            double x1, y1, x2, y2;
+            if (rect2.X < rect1.X)
             {
-                return ParentLineRegion;
-            }
-            double mouseDownRectHeight;
-            if (_startY <= y)
-            {
-                mouseDownRectHeight = _mouseDownLineRegion.Y + _mouseDownLineRegion.Height - RectangleCanvasTop;
+                x1 = rect1.X;
             }
             else
             {
-                mouseDownRectHeight = RectangleCanvasTop - _mouseDownLineRegion.Y;
+                x1 = rect2.X;
             }
-            double mouseUpRectHeight;
-            if (_startY <= y)
+            if (rect1.X + rect1.Width < rect2.X + rect2.Width)
             {
-                mouseUpRectHeight = RectangleHeight + RectangleCanvasTop - _mouseUpLineRegion.Y;
+                x2 = rect1.X + rect1.Width;
             }
             else
             {
-                mouseUpRectHeight = _mouseUpLineRegion.Y + _mouseUpLineRegion.Height - (RectangleHeight + RectangleCanvasTop);
+                x2 = rect2.X + rect2.Width;
             }
-            if (mouseDownRectHeight < mouseUpRectHeight)
+            if (rect2.Y < rect1.Y)
             {
-                ParentLineRegion = _mouseUpLineRegion;
+                y1 = rect1.Y;
             }
-            return ParentLineRegion;
+            else
+            {
+                y1 = rect2.Y;
+            }
+            if (rect1.Y + rect1.Height < rect2.Y + rect2.Height)
+            {
+                y2 = rect1.Y + rect1.Height;
+            }
+            else
+            {
+                y2 = rect2.Y + rect2.Height;
+            }
+            return new RectangleRegion() { X = x1, Y =  y1, Width = x2-x1, Height = y2-y1 };
+        }
+        private bool IsIntersect(RectangleRegion rect1, RectangleRegion rect2) 
+        {
+            bool aLeftOfB = (rect1.X + rect1.Width) < rect2.X;
+            bool aRightOfB = rect1.X > (rect2.X + rect2.Width);
+            bool aAboveB = (rect1.Y + rect1.Height) < rect2.Y;
+            bool aBelowB = rect1.Y > (rect2.Y + rect2.Height);
+            return !(aLeftOfB || aRightOfB || aAboveB || aBelowB);
         }
         public virtual void RectangleMouseDown(double x, double y)
         {
+            RectangleVisibility = true;
             RectangleWidth = 0;
             RectangleHeight = 0;
-            IsStartedDrawing = true;
             _startX = x;
             _startY = y;
-            FindParentRectangleMouseDown(x, y);
-            RectangleVisibility = true;
         }
         public void RectangleMouseMove(double x, double y)
         {
-            if (IsStartedDrawing)
+            if (RectangleVisibility)
             {
                 CalculateRecntangle(x, y);
             }
         }
         public void RectangleMouseUp(double x, double y)
         {
-            IsStartedDrawing = false;
             RectangleVisibility = false;
             SelectRectangle();
             if (IsSmallRectangle())
             {
                 return;
             }
-            FindParentRectangleMouseUp(x, y);
-            LineRegion ParentLineRegion = DefineParentRectangle(x, y);
             RegionCreator creator = new RegionCreator(
                 RectangleCanvasLeft,
                 RectangleCanvasTop,
@@ -269,10 +296,12 @@ namespace TranskribusPractice.ViewModels.Implementations
                         creator.CreateTextRegion("Paragraph " + (TextRegions.Count + 1)));
                     break;
                 case Region.Line:
-                    _mouseDownTextRegion?.Lines.Add(
-                        creator.CreateLineRegion("Line " + (_mouseDownTextRegion.Lines.Count + 1)));
+                    TextRegion ParentTextRegion = DefineParentText();
+                    ParentTextRegion?.Lines.Add(
+                        creator.CreateLineRegion("Line " + (ParentTextRegion.Lines.Count + 1)));
                     break;
                 case Region.Word:
+                    LineRegion ParentLineRegion = DefineParentLine();
                     ParentLineRegion?.Words.Add(
                         creator.CreateWordRegion("Word " + (ParentLineRegion.Words.Count + 1)));
                     break;
