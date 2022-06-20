@@ -13,6 +13,7 @@ namespace TranskribusPractice.ViewModels.Implementations
         private double _rectangleHeight;
         private double _rectangleCanvasLeft;
         private double _rectangleCanvasTop;
+       
         private bool _rectangleVisibility;
         private Region _mode = Region.Text;
         private RectangleRegion _selectedRectangle;
@@ -76,7 +77,7 @@ namespace TranskribusPractice.ViewModels.Implementations
                 NotifyPropertyChanged();
             }
         }
-        public RectangleRegion SelectedRectangle
+        public override RectangleRegion SelectedRectangle
         {
             get => _selectedRectangle;
             set
@@ -112,35 +113,6 @@ namespace TranskribusPractice.ViewModels.Implementations
             RectangleCanvasTop = _startY <= endY ? _startY : endY;
             RectangleWidth = Math.Abs(endX - _startX);
             RectangleHeight = Math.Abs(endY - _startY);
-        }
-        private void SelectRectangle()
-        {
-            foreach (var text in TextRegions)
-            {
-                if (IsInRectangle(_startX, _startY, text))
-                {
-                    TextRegion tr = text;
-                    SelectedRectangle = tr;
-                    foreach (var line in tr.Lines)
-                    {
-                        if (IsInRectangle(_startX, _startY, line))
-                        {
-                            LineRegion lr = line;
-                            SelectedRectangle = lr;
-                            foreach (var word in lr.Words)
-                            {
-                                if (IsInRectangle(_startX, _startY, word))
-                                {
-                                    SelectedRectangle = word;
-                                    break;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                    break;
-                }
-            }
         }
         public RectangleRegion DefineParent(RectangleRegion child, IEnumerable<RectangleRegion> parents)
         {
@@ -279,7 +251,7 @@ namespace TranskribusPractice.ViewModels.Implementations
         public void RectangleMouseUp(double x, double y)
         {
             RectangleVisibility = false;
-            SelectRectangle();
+            BuildRichTextBox();
             if (IsSmallRectangle())
             {
                 return;

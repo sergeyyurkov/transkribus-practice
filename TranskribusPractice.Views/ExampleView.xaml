@@ -33,9 +33,6 @@
         </HierarchicalDataTemplate>
         <!-- -->
         <Style TargetType="Border" x:Key="RectangleChosenBorder">
-            <d:Style.DataContext>
-                <x:Type Type="local:MainWindow"/>
-            </d:Style.DataContext>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}, Path=(Grid.IsMouseOver)}" Value="True">
                     <Setter  Property="Border.BorderThickness" Value="4"/>
@@ -45,33 +42,51 @@
         </Style>
         <DataTemplate x:Key="TextTemplate" DataType="{x:Type area:TextRegion}">
             <Grid Background="Transparent">
-                <Rectangle
+                <Rectangle x:Name="UITextRectangle"
                 Width="{Binding Width}"
                 Height="{Binding Height}"
                 Opacity="0.5" Fill="Red"/>
                 <Border Name="border" Style="{StaticResource RectangleChosenBorder}"/>
                 <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4"/>
             </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentControl}}, Path=IsSelected}" Value="True">
+                    <Setter TargetName="UITextRectangle" Property="Fill" Value="Yellow"/>
+                    <Setter TargetName="UITextRectangle" Property="Opacity" Value="0.65"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
         </DataTemplate>
         <DataTemplate x:Key="LineTemplate" DataType="{x:Type area:LineRegion}">
             <Grid Background="Transparent">
-                <Rectangle
+                <Rectangle x:Name="UILineRectangle"
                 Width="{Binding Width}"
                 Height="{Binding Height}"
                 Opacity="0.5" Fill="Blue"/>
                 <Border Name="border"  Style="{StaticResource RectangleChosenBorder}"/>
                 <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4"/>
             </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentControl}}, Path=IsSelected}" Value="True">
+                    <Setter TargetName="UILineRectangle" Property="Fill" Value="Yellow"/>
+                    <Setter TargetName="UILineRectangle" Property="Opacity" Value="0.65"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
         </DataTemplate>
         <DataTemplate x:Key="WordTemplate" DataType="{x:Type area:WordRegion}">
             <Grid  Background="Transparent">
-                <Rectangle
+                <Rectangle x:Name="UIWordRectangle"
                 Width="{Binding Width}"
                 Height="{Binding Height}"
                 Opacity="0.5" Fill="Green"/>
                 <Border Name="border" Style="{StaticResource RectangleChosenBorder}"/>
                 <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4"/>
             </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentControl}}, Path=IsSelected}" Value="True">
+                    <Setter TargetName="UIWordRectangle" Property="Fill" Value="Yellow"/>
+                    <Setter TargetName="UIWordRectangle" Property="Opacity" Value="0.65"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
         </DataTemplate>
     </UserControl.Resources>
     <DockPanel>
@@ -95,7 +110,7 @@
                 <RadioButton Content="Text" Command="{Binding SetTextRegionModeCommand}" IsChecked="True" Style="{StaticResource {x:Type ToggleButton}}"/>
                 <RadioButton Content="Line" Command="{Binding SetLineRegionModeCommand}" Style="{StaticResource {x:Type ToggleButton}}"/>
                 <RadioButton Content="Word" Command="{Binding SetWordRegionModeCommand}" Style="{StaticResource {x:Type ToggleButton}}"/>
-                <RadioButton Content="Selection" Command="{Binding SetWordRegionModeCommand}" Style="{StaticResource {x:Type ToggleButton}}"/>
+                <RadioButton Content="Selection" Command="{Binding SetSelectionModeCommand}" Style="{StaticResource {x:Type ToggleButton}}"/>
             </ItemsControl>
         </StackPanel>
         <DockPanel DockPanel.Dock="Left">
@@ -116,7 +131,7 @@
                       MouseMove="ImageArea_MouseMove" 
                       MouseUp="ImageArea_MouseUp">
                     <Image x:Name="Image" Source="{Binding Path=JpgPath}"/>
-                    <Canvas x:Name="ImageArea">
+                    <Canvas Focusable="{Binding SelectionMode}" x:Name="ImageArea">
                         <Rectangle x:Name="RectangleUI"
                                    StrokeThickness="2"    
                                    Width="{Binding  RectangleWidth}"
@@ -135,11 +150,13 @@
                             </Rectangle.Style>
                         </Rectangle>
                     </Canvas>
-                    <ListBox Background="Transparent" ItemsSource="{Binding AllRegions}" ItemTemplateSelector="{StaticResource rectangleRegionTemplateSelector}">
+                    <ListBox  Background="Transparent" ItemsSource="{Binding AllRegions}"  SelectedItem="{Binding SelectedRectangle}" ItemTemplateSelector="{StaticResource rectangleRegionTemplateSelector}">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="{x:Type ListBoxItem}">
                                 <Setter Property="Canvas.Left" Value="{Binding Path=X}"/>
                                 <Setter Property="Canvas.Top" Value="{Binding Path=Y}"/>
+                                <Setter Property="Focusable" Value="{Binding SelectionMode}"/>
+                                <Setter Property="IsHitTestVisible" Value="{Binding SelectionMode}" />
                             </Style>
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemsPanel>

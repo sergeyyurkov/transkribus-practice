@@ -23,6 +23,7 @@ namespace TranskribusPractice.Views.Design
         public override double RectangleCanvasTop { get; set; }
         public override Region Mode { get; set; }
         public override bool RectangleVisibility { get; set; }
+        public override RectangleRegion SelectedRectangle { get; set; }
         public override ObservableCollection<RectangleRegion> AllRegions
         {
             get => _allRegions ?? (_allRegions = new ObservableCollection<RectangleRegion>());
@@ -39,5 +40,6 @@ namespace TranskribusPractice.Views.Design
         public override ICommand SetTextRegionModeCommand => null;
         public override ICommand SetLineRegionModeCommand => null;
         public override ICommand SetWordRegionModeCommand => null;
+        public override ICommand SetSelectionModeCommand => null;
     }
 }

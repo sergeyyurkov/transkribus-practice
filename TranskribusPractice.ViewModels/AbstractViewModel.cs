@@ -16,6 +16,7 @@ namespace TranskribusPractice.ViewModels
         public abstract double RectangleCanvasTop { get; set; }
         public abstract Region Mode { get; set; }
         public abstract bool RectangleVisibility { get; set; }
+        public abstract RectangleRegion SelectedRectangle { get; set; }
         public abstract ObservableCollection<RectangleRegion> AllRegions { get; set; }
         public abstract ObservableCollection<TextRegion> TextRegions { get; set; }
         public abstract ICommand SaveCommand { get; }
@@ -24,5 +25,6 @@ namespace TranskribusPractice.ViewModels
         public abstract ICommand SetTextRegionModeCommand { get; }
         public abstract ICommand SetLineRegionModeCommand { get; }
         public abstract ICommand SetWordRegionModeCommand { get; }
+        public abstract ICommand SetSelectionModeCommand { get; }
     }
 }

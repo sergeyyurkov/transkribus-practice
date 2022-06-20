@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
 using System.Windows.Input;
 using TranskribusPractice.BusinessDomain.AreaConcept;
 using TranskribusPractice.ViewModels.Implementations.Commands;
@@ -9,15 +10,46 @@ namespace TranskribusPractice.ViewModels.Implementations
 {
     public partial class ImplViewModel : AbstractViewModel, IMouseAware
     {
+        private string _textLeft;
+        private string _textRight;
+        private string _textSelected;
         private ObservableCollection<RectangleRegion> _allRegions;
         private ObservableCollection<TextRegion> _textRegions;
         private RelayCommand _setTextRegionModeCommand;
         private RelayCommand _setLineRegionModeCommand;
         private RelayCommand _setWordRegionModeCommand;
+        private RelayCommand _setSelectionModeCommand;
         public override string JpgPath { get; set; } = "test.jpg";
-        public override string TextLeft { get; set; } = "Real Text Left";
-        public override string TextRight { get; set; } = "Real Text Riht";
-        public override string TextSelected { get; set; } = "Real Text Selected";
+        public override string TextLeft
+        {
+            get => _textLeft;
+            set
+            {
+                if (_textLeft == value) return;
+                _textLeft = value;
+                NotifyPropertyChanged();
+            }
+        }
+        public override string TextRight
+        {
+            get => _textRight;
+            set
+            {
+                if (_textRight == value) return;
+                _textRight = value;
+                NotifyPropertyChanged();
+            }
+        }
+        public override string TextSelected
+        {
+            get => _textSelected;
+            set
+            {
+                if (_textSelected == value) return;
+                _textSelected = value;
+                NotifyPropertyChanged();
+            }
+        }
         public override ObservableCollection<TextRegion> TextRegions
         {
             get => _textRegions;
@@ -46,6 +78,10 @@ namespace TranskribusPractice.ViewModels.Implementations
             get => _setTextRegionModeCommand ??
                     (_setTextRegionModeCommand = new RelayCommand((o) =>
                     {
+                        foreach (var region in AllRegions)
+                        {
+                            region.SelectionMode = false;
+                        }
                         Mode = Region.Text;
                     }));
         }
@@ -54,6 +90,10 @@ namespace TranskribusPractice.ViewModels.Implementations
             get => _setLineRegionModeCommand ??
                     (_setLineRegionModeCommand = new RelayCommand((o) =>
                     {
+                        foreach (var region in AllRegions)
+                        {
+                            region.SelectionMode = false;
+                        }
                         Mode = Region.Line;
                     }));
         }
@@ -62,15 +102,30 @@ namespace TranskribusPractice.ViewModels.Implementations
             get => _setWordRegionModeCommand ??
                     (_setWordRegionModeCommand = new RelayCommand((o) =>
                     {
+                        foreach (var region in AllRegions)
+                        {
+                            region.SelectionMode = false;
+                        }
                         Mode = Region.Word;
                     }));
         }
-
+        public override ICommand SetSelectionModeCommand
+        {
+            get => _setSelectionModeCommand ??
+                    (_setSelectionModeCommand = new RelayCommand((o) =>
+                    {
+                        foreach (var region in AllRegions)
+                        {
+                            region.SelectionMode = true;
+                        }
+                    }));
+        }
         public ImplViewModel() 
         {
             FillTextRegions();
             UpdateAllRegions();
         }
+
         private void UpdateAllRegions()
         {
             AllRegions = new ObservableCollection<RectangleRegion>();
@@ -86,6 +141,90 @@ namespace TranskribusPractice.ViewModels.Implementations
                     }
                 }
             }
+        }
+        public void BuildRichTextBox()
+        {
+            StringBuilder sbl = new StringBuilder();
+            StringBuilder sbs = new StringBuilder();
+            StringBuilder sbr = new StringBuilder();
+            bool isSelection = false;
+            bool wasSelection = false;
+            int lineCounter = 1;
+            foreach (var text in TextRegions)
+            {
+                if (SelectedRectangle == text)
+                {
+                    isSelection = true;
+                }
+                foreach (var line in text.Lines ?? Enumerable.Empty<LineRegion>())
+                {
+                    if (SelectedRectangle == line)
+                    {
+                        isSelection = true;
+                    }
+                    if (!isSelection && !wasSelection)
+                    {
+                        sbl.Append(lineCounter++ + ".");
+                    }
+                    else if (isSelection)
+                    {
+                        sbs.Append(lineCounter++ + ".");
+                    }
+                    else if (wasSelection)
+                    {
+                        sbr.Append(lineCounter++ + ".");
+                    }
+                    foreach (var word in line.Words ?? Enumerable.Empty<WordRegion>())
+                    {
+                        if (SelectedRectangle == word)
+                        {
+                            isSelection = true;
+                        }
+                        if (!isSelection && !wasSelection)
+                        {
+                            sbl.Append(' ' + word.Content);
+                        }
+                        else if (isSelection)
+                        {
+                            sbs.Append(' ' + word.Content);
+                        }
+                        else if (wasSelection)
+                        {
+                            sbr.Append(' ' + word.Content);
+                        }
+                        if (SelectedRectangle == word)
+                        {
+                            isSelection = false;
+                            wasSelection = true;
+                        }
+                    }
+                    if (!isSelection && !wasSelection)
+                    {
+                        sbl.Append(Environment.NewLine);
+                    }
+                    else if (isSelection)
+                    {
+                        sbs.Append(Environment.NewLine);
+                    }
+                    else if (wasSelection)
+                    {
+                        sbr.Append(Environment.NewLine);
+                    }
+                    if (SelectedRectangle == line)
+                    {
+                        isSelection = false;
+                        wasSelection = true;
+                    }
+                }
+                if (SelectedRectangle == text)
+                {
+                    isSelection = false;
+                    wasSelection = true;
+                }
+            }
+            TextLeft = sbl.ToString();
+            TextSelected = sbs.ToString();
+            TextRight = sbr.ToString();
         }
         private void FillTextRegions()
         {
