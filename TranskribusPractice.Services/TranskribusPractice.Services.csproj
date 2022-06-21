@@ -49,5 +49,11 @@
     <Compile Include="ServiceProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TranskribusPractice.BusinessDomain\TranskribusPractice.BusinessDomain.csproj">
+      <Project>{f82c6792-7ca9-4d36-9762-65995bfd79cc}</Project>
+      <Name>TranskribusPractice.BusinessDomain</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

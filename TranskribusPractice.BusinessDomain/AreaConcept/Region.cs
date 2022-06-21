@@ -8,6 +8,7 @@ namespace TranskribusPractice.BusinessDomain.AreaConcept
     {
         Text,
         Line,
-        Word
+        Word,
+        Undefined
     }
 }

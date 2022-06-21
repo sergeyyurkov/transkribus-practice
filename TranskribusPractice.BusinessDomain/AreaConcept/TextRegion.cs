@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TranskribusPractice.BusinessDomain.AreaConcept
 {
-    public class TextRegion : RectangleRegion
+    public class TextRegion : RectangleRegion, ICloneable
     {
         private ObservableCollection<LineRegion> _lines;
         public ObservableCollection<LineRegion> Lines
@@ -20,6 +20,24 @@ namespace TranskribusPractice.BusinessDomain.AreaConcept
                 _lines = value;
                 NotifyPropertyChanged();
             }
+        }
+        public object Clone()
+        {
+            var lines = new ObservableCollection<LineRegion>();
+            foreach (var line in this.Lines)
+            {
+                lines.Add((LineRegion)line.Clone());
+            }
+            return new TextRegion()
+            {
+                X = this.X,
+                Y = this.Y,
+                Width = this.Width,
+                Height = this.Height,
+                Name = this.Name,
+                SelectionMode = false,
+                Lines = lines
+            };
         }
     }
 }

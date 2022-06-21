@@ -7,6 +7,7 @@ namespace TranskribusPractice.ViewModels
     public abstract class AbstractViewModel : BaseViewModel
     {
         public abstract string JpgPath { get; set; }
+        public abstract string ProjectPath { get; set; }
         public abstract string TextLeft { get; set; }
         public abstract string TextRight { get; set; }
         public abstract string TextSelected { get; set; }
@@ -19,9 +20,10 @@ namespace TranskribusPractice.ViewModels
         public abstract RectangleRegion SelectedRectangle { get; set; }
         public abstract ObservableCollection<RectangleRegion> AllRegions { get; set; }
         public abstract ObservableCollection<TextRegion> TextRegions { get; set; }
-        public abstract ICommand SaveCommand { get; }
         public abstract ICommand OpenJpgFileCommand { get; }
-        public abstract ICommand SaveAsCommand { get; }
+        public abstract ICommand OpenProjectFileCommand { get; }
+        public abstract ICommand SaveProjectCommand { get; }
+        public abstract ICommand SaveAsProjectCommand { get; }
         public abstract ICommand SetTextRegionModeCommand { get; }
         public abstract ICommand SetLineRegionModeCommand { get; }
         public abstract ICommand SetWordRegionModeCommand { get; }

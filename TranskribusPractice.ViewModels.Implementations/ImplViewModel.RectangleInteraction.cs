@@ -13,7 +13,6 @@ namespace TranskribusPractice.ViewModels.Implementations
         private double _rectangleHeight;
         private double _rectangleCanvasLeft;
         private double _rectangleCanvasTop;
-       
         private bool _rectangleVisibility;
         private Region _mode = Region.Text;
         private RectangleRegion _selectedRectangle;
@@ -87,17 +86,6 @@ namespace TranskribusPractice.ViewModels.Implementations
                 NotifyPropertyChanged();
             }
         }
-        private bool IsInRectangle(double x, double y, RectangleRegion rectangle)
-        {
-            if (rectangle.X <= x
-                && rectangle.Y <= y
-                && (rectangle.X + rectangle.Width) >= x
-                && (rectangle.Y + rectangle.Height) >= y)
-            {
-                return true;
-            }
-            return false;
-        }
         public bool IsSmallRectangle()
         {
             // TODO SystemParameters.MinimumHorizontalDragDistance 
@@ -113,25 +101,6 @@ namespace TranskribusPractice.ViewModels.Implementations
             RectangleCanvasTop = _startY <= endY ? _startY : endY;
             RectangleWidth = Math.Abs(endX - _startX);
             RectangleHeight = Math.Abs(endY - _startY);
-        }
-        public RectangleRegion DefineParent(RectangleRegion child, IEnumerable<RectangleRegion> parents)
-        {
-            double parentArea = 0;
-            RectangleRegion parent = null;
-            foreach (var rect in parents)
-            {
-                if (IsIntersect(rect, child))
-                {
-                    RectangleRegion intersectedRectangle = CreateIntersectedRect(rect, child);
-                    double area = intersectedRectangle.CalculateArea();
-                    if (parentArea < area)
-                    {
-                        parent = rect;
-                        parentArea = area;
-                    }
-                }
-            }
-            return parent;
         }
         public TextRegion DefineParentText()
         {
@@ -235,6 +204,10 @@ namespace TranskribusPractice.ViewModels.Implementations
         }
         public virtual void RectangleMouseDown(double x, double y)
         {
+            if (Mode == Region.Undefined) 
+            {
+                return;
+            }
             RectangleVisibility = true;
             RectangleWidth = 0;
             RectangleHeight = 0;
@@ -251,8 +224,7 @@ namespace TranskribusPractice.ViewModels.Implementations
         public void RectangleMouseUp(double x, double y)
         {
             RectangleVisibility = false;
-            BuildRichTextBox();
-            if (IsSmallRectangle())
+            if (IsSmallRectangle() || Mode == Region.Undefined)
             {
                 return;
             }
@@ -280,6 +252,7 @@ namespace TranskribusPractice.ViewModels.Implementations
                 default: break;
             }
             UpdateAllRegions();
+            BuildRichTextBox();
         }
     }
 }

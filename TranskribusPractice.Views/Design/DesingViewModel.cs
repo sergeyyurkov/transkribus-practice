@@ -14,6 +14,7 @@ namespace TranskribusPractice.Views.Design
         private ObservableCollection<RectangleRegion> _allRegions;
         private ObservableCollection<TextRegion> _textRegions;
         public override string JpgPath { get; set; } = "test.jpg";
+        public override string ProjectPath { get ; set; } = "test.xml";
         public override string TextLeft { get; set; } = "Example Text Left";
         public override string TextRight { get; set; } = "Example Text Riht";
         public override string TextSelected { get; set; } = "Example Text Selected";
@@ -34,12 +35,14 @@ namespace TranskribusPractice.Views.Design
             get => _textRegions ?? (_textRegions = new ObservableCollection<TextRegion>());
             set => _textRegions = value;
         }
-        public override ICommand SaveCommand => null;
         public override ICommand OpenJpgFileCommand => null;
-        public override ICommand SaveAsCommand => null;
+        public override ICommand OpenProjectFileCommand => null;
+        public override ICommand SaveProjectCommand => null;
+        public override ICommand SaveAsProjectCommand => null;
         public override ICommand SetTextRegionModeCommand => null;
         public override ICommand SetLineRegionModeCommand => null;
         public override ICommand SetWordRegionModeCommand => null;
         public override ICommand SetSelectionModeCommand => null;
+
     }
 }

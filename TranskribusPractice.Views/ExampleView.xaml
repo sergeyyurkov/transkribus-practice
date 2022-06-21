@@ -94,10 +94,10 @@
         <DockPanel DockPanel.Dock="Top">
             <Menu>
                 <MenuItem Header="Project">
-                    <MenuItem Header="Open project"/>
                     <MenuItem Header="Open jpg" Command="{Binding OpenJpgFileCommand}" />
-                    <MenuItem Header="Save project"/>
-                    <MenuItem Header="Save project as"/>
+                    <MenuItem Header="Open project" Command="{Binding OpenProjectFileCommand}"/>
+                    <MenuItem Header="Save project" Command="{Binding SaveProjectCommand}"/>
+                    <MenuItem Header="Save project as" Command="{Binding SaveAsProjectCommand}"/>
                 </MenuItem>
             </Menu>
         </DockPanel>
@@ -132,7 +132,7 @@
                       MouseMove="ImageArea_MouseMove" 
                       MouseUp="ImageArea_MouseUp">
                     <Image x:Name="Image" Source="{Binding Path=JpgPath}"/>
-                    <Canvas Focusable="{Binding SelectionMode}" x:Name="ImageArea">
+                    <Canvas x:Name="ImageArea">
                         <Rectangle x:Name="RectangleUI"
                                    StrokeThickness="2"    
                                    Width="{Binding  RectangleWidth}"

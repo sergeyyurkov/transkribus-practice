@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Windows.Input;
+using TranskribusPractice.BusinessDomain;
 using TranskribusPractice.BusinessDomain.AreaConcept;
 using TranskribusPractice.Services;
 using TranskribusPractice.ViewModels.Implementations.Commands;
@@ -11,13 +12,17 @@ namespace TranskribusPractice.ViewModels.Implementations
 {
     public partial class ImplViewModel : AbstractViewModel, IMouseAware
     {
+        private string _jpgPath;
         private string _textLeft;
         private string _textRight;
         private string _textSelected;
-        private string _jpgPath;
-        private ObservableCollection<RectangleRegion> _allRegions;
-        private ObservableCollection<TextRegion> _textRegions;
+        private bool _selectiongMode;
+        private ObservableCollection<RectangleRegion> _allRegions = new ObservableCollection<RectangleRegion>();
+        private ObservableCollection<TextRegion> _textRegions = new ObservableCollection<TextRegion>();
         private RelayCommand _openJpgFileCommand;
+        private RelayCommand _openProjectFileCommand;
+        private RelayCommand _saveProjectCommand;
+        private RelayCommand _saveAsProjectCommand;
         private RelayCommand _setTextRegionModeCommand;
         private RelayCommand _setLineRegionModeCommand;
         private RelayCommand _setWordRegionModeCommand;
@@ -33,6 +38,7 @@ namespace TranskribusPractice.ViewModels.Implementations
                 NotifyPropertyChanged();
             }
         }
+        public override string ProjectPath{ get; set; }
         public override string TextLeft
         {
             get => _textLeft;
@@ -83,30 +89,83 @@ namespace TranskribusPractice.ViewModels.Implementations
                 NotifyPropertyChanged();
             }
         }
-        public override ICommand SaveCommand => null;
+      
         public override ICommand OpenJpgFileCommand
         {
             get => _openJpgFileCommand ??
                     (_openJpgFileCommand = new RelayCommand((o) =>
                     {
                         var fileService = (IFileService)_serviceProvider.GetService(typeof(IFileService));
-                        string file = fileService.OpenJpgFile();
-                        if (file != null || file != string.Empty)
+                        string path = fileService.OpenJpgFile();
+                        if (path != null && path != string.Empty)
                         {
-                            JpgPath = file;
+                            JpgPath = path;
                         }
                     }));
         }
-        public override ICommand SaveAsCommand => null;
+        public override ICommand OpenProjectFileCommand
+        {
+            get => _openProjectFileCommand ??
+                    (_openProjectFileCommand = new RelayCommand((o) =>
+                    {
+                        var projectService = (IProjectService)_serviceProvider.GetService(typeof(IProjectService));
+                        Project project;
+                        string path = projectService.OpenProjectFile(out project);
+                        if ((path != string.Empty && path != null) && !(project is null)) 
+                        {
+                            ProjectPath = path;
+                            JpgPath = project.JpgPath;
+                            TextRegions = project.TextRegions;
+                            UpdateAllRegions();
+                            BuildRichTextBox();
+                            if (_selectiongMode)
+                            {
+                                TurnOnSelection();
+                            }
+                        }
+                    }));
+        }
+        public override ICommand SaveProjectCommand
+        {
+            get => _saveProjectCommand ??
+                    (_saveProjectCommand = new RelayCommand((o) =>
+                    {
+                        var projectService = (IProjectService)_serviceProvider.GetService(typeof(IProjectService));
+                        if ((ProjectPath != string.Empty && ProjectPath != null)
+                            && (JpgPath != string.Empty && JpgPath != null))
+                        {
+                            var textRegions = new ObservableCollection<TextRegion>();
+                            foreach (var text in TextRegions)
+                            {
+                                textRegions.Add((TextRegion)text.Clone());
+                            }
+                            projectService.Save(ProjectPath, new Project(JpgPath, textRegions));
+                        }
+                    }));
+        }
+        public override ICommand SaveAsProjectCommand
+        {
+            get => _saveAsProjectCommand ??
+                    (_saveAsProjectCommand = new RelayCommand((o) =>
+                    {
+                        var projectService = (IProjectService)_serviceProvider.GetService(typeof(IProjectService));
+                        if (JpgPath != string.Empty && JpgPath != null) 
+                        {
+                            var textRegions = new ObservableCollection<TextRegion>();
+                            foreach (var text in TextRegions)
+                            {
+                                textRegions.Add((TextRegion)text.Clone());
+                            }
+                            ProjectPath = projectService.SaveAs(new Project(JpgPath, textRegions));
+                        }
+                    }));
+        }
         public override ICommand SetTextRegionModeCommand
         {
             get => _setTextRegionModeCommand ??
                     (_setTextRegionModeCommand = new RelayCommand((o) =>
                     {
-                        foreach (var region in AllRegions)
-                        {
-                            region.SelectionMode = false;
-                        }
+                        TurnOffSelection();
                         Mode = Region.Text;
                     }));
         }
@@ -115,10 +174,7 @@ namespace TranskribusPractice.ViewModels.Implementations
             get => _setLineRegionModeCommand ??
                     (_setLineRegionModeCommand = new RelayCommand((o) =>
                     {
-                        foreach (var region in AllRegions)
-                        {
-                            region.SelectionMode = false;
-                        }
+                        TurnOffSelection();
                         Mode = Region.Line;
                     }));
         }
@@ -127,11 +183,9 @@ namespace TranskribusPractice.ViewModels.Implementations
             get => _setWordRegionModeCommand ??
                     (_setWordRegionModeCommand = new RelayCommand((o) =>
                     {
-                        foreach (var region in AllRegions)
-                        {
-                            region.SelectionMode = false;
-                        }
+                        TurnOffSelection();
                         Mode = Region.Word;
+                        
                     }));
         }
         public override ICommand SetSelectionModeCommand
@@ -139,18 +193,32 @@ namespace TranskribusPractice.ViewModels.Implementations
             get => _setSelectionModeCommand ??
                     (_setSelectionModeCommand = new RelayCommand((o) =>
                     {
-                        foreach (var region in AllRegions)
-                        {
-                            region.SelectionMode = true;
-                        }
+                        TurnOnSelection();
+                        Mode = Region.Undefined;
                     }));
         }
         public ImplViewModel() 
         {
             FillTextRegions();
             UpdateAllRegions();
+            BuildRichTextBox();
         }
-
+        private void TurnOffSelection() 
+        {
+            foreach (var region in AllRegions)
+            {
+                region.SelectionMode = false;
+            }
+            _selectiongMode = false;
+        }
+        private void TurnOnSelection()
+        {
+            foreach (var region in AllRegions)
+            {
+                region.SelectionMode = true;
+            }
+            _selectiongMode = true;
+        }
         private void UpdateAllRegions()
         {
             AllRegions = new ObservableCollection<RectangleRegion>();
