@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Input;
 using TranskribusPractice.BusinessDomain.AreaConcept;
+using TranskribusPractice.Services;
 using TranskribusPractice.ViewModels.Implementations.Commands;
 
 namespace TranskribusPractice.ViewModels.Implementations
@@ -15,10 +16,12 @@ namespace TranskribusPractice.ViewModels.Implementations
         private string _textSelected;
         private ObservableCollection<RectangleRegion> _allRegions;
         private ObservableCollection<TextRegion> _textRegions;
+        private RelayCommand _openJpgFileCommand;
         private RelayCommand _setTextRegionModeCommand;
         private RelayCommand _setLineRegionModeCommand;
         private RelayCommand _setWordRegionModeCommand;
         private RelayCommand _setSelectionModeCommand;
+        private readonly IServiceProvider _serviceProvider = new ServiceProvider();
         public override string JpgPath { get; set; } = "test.jpg";
         public override string TextLeft
         {
@@ -71,7 +74,19 @@ namespace TranskribusPractice.ViewModels.Implementations
             }
         }
         public override ICommand SaveCommand => null;
-        public override ICommand OpenCommand => null;
+        public override ICommand OpenJpgFileCommand
+        {
+            get => _openJpgFileCommand ??
+                    (_openJpgFileCommand = new RelayCommand((o) =>
+                    {
+                        var fileService = (IFileService)_serviceProvider.GetService(typeof(IFileService));
+                        string file = fileService.OpenJpgFile();
+                        if (file != null || file != string.Empty)
+                        {
+                            JpgPath = file;
+                        }
+                    }));
+        }
         public override ICommand SaveAsCommand => null;
         public override ICommand SetTextRegionModeCommand
         {
@@ -164,15 +179,15 @@ namespace TranskribusPractice.ViewModels.Implementations
                     }
                     if (!isSelection && !wasSelection)
                     {
-                        sbl.Append(lineCounter++ + ".");
+                        sbl.Append(lineCounter++ + ". ");
                     }
                     else if (isSelection)
                     {
-                        sbs.Append(lineCounter++ + ".");
+                        sbs.Append(lineCounter++ + ". ");
                     }
                     else if (wasSelection)
                     {
-                        sbr.Append(lineCounter++ + ".");
+                        sbr.Append(lineCounter++ + ". ");
                     }
                     foreach (var word in line.Words ?? Enumerable.Empty<WordRegion>())
                     {
@@ -182,15 +197,15 @@ namespace TranskribusPractice.ViewModels.Implementations
                         }
                         if (!isSelection && !wasSelection)
                         {
-                            sbl.Append(' ' + word.Content);
+                            sbl.Append(word.Content + ' ');
                         }
                         else if (isSelection)
                         {
-                            sbs.Append(' ' + word.Content);
+                            sbs.Append(word.Content + ' ');
                         }
                         else if (wasSelection)
                         {
-                            sbr.Append(' ' + word.Content);
+                            sbr.Append(word.Content + ' ');
                         }
                         if (SelectedRectangle == word)
                         {

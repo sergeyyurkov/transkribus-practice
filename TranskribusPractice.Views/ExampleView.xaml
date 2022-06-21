@@ -13,6 +13,7 @@
         <design:RectangleRegionTemplateSelector x:Key="rectangleRegionTemplateSelector"/>
         <design:RectangleColorConverter x:Key="rectangleColorConverter"/>
         <design:RectangleVisibilityConverter x:Key="rectangleVisibilityConverter"/>
+        <design:RectangleContentConverter x:Key="rectangleContentConverter"/>
         <DataTemplate  x:Key="Word">
             <TextBlock Text="{Binding Name}" />
         </DataTemplate>
@@ -93,10 +94,10 @@
         <DockPanel DockPanel.Dock="Top">
             <Menu>
                 <MenuItem Header="Project">
-                    <MenuItem Header="New" />
-                    <MenuItem Header="Open" Command="{Binding OpenFileCommand}" />
-                    <MenuItem Header="Save" />
-                    <MenuItem Header="Save as" />
+                    <MenuItem Header="Open project"/>
+                    <MenuItem Header="Open jpg" Command="{Binding OpenJpgFileCommand}" />
+                    <MenuItem Header="Save project"/>
+                    <MenuItem Header="Save project as"/>
                 </MenuItem>
             </Menu>
         </DockPanel>
@@ -150,15 +151,25 @@
                             </Rectangle.Style>
                         </Rectangle>
                     </Canvas>
-                    <ListBox  Background="Transparent" ItemsSource="{Binding AllRegions}"  SelectedItem="{Binding SelectedRectangle}" ItemTemplateSelector="{StaticResource rectangleRegionTemplateSelector}">
+                    <ListBox Background="Transparent" ItemsSource="{Binding AllRegions}"  SelectedItem="{Binding SelectedRectangle}" ItemTemplateSelector="{StaticResource rectangleRegionTemplateSelector}">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="{x:Type ListBoxItem}">
                                 <Setter Property="Canvas.Left" Value="{Binding Path=X}"/>
                                 <Setter Property="Canvas.Top" Value="{Binding Path=Y}"/>
                                 <Setter Property="Focusable" Value="{Binding SelectionMode}"/>
                                 <Setter Property="IsHitTestVisible" Value="{Binding SelectionMode}" />
+                                <Style.Resources>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="Transparent"/>
+                                </Style.Resources>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="Transparent" />
+                                    </Trigger>
+                                </Style.Triggers>
                             </Style>
-                        </ListBox.ItemContainerStyle>
+                        </ListBox.ItemContainerStyle>   
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <Canvas IsItemsHost="True" Background="Transparent"/>
@@ -167,13 +178,13 @@
                     </ListBox>
                 </Grid>
             </ScrollViewer>
-            <TextBox FontSize="16" Grid.Column="0" Grid.Row="2" Text="{Binding SelectedRectangle.Content}"/>
+            <TextBox FontSize="16" Grid.Column="0" Grid.Row="2" Text="{Binding SelectedRectangle, Converter={StaticResource rectangleContentConverter}}"/>
             <RichTextBox x:Name="richTB" FontSize="16"  Grid.Column="1" Grid.RowSpan="2">
                 <FlowDocument >
                     <Paragraph Name="myParagraph" >
-                        <Run Text="{Binding TextLeft}"/>
-                        <Run FontWeight="Bold" Text="{Binding TextSelected}"/>
-                        <Run Text="{Binding TextRight}"/>
+                        <TextBlock>
+                        <Run Text="{Binding TextLeft}"/><Run FontWeight="Bold" Text="{Binding TextSelected}"/><Run Text="{Binding TextRight}"/>
+                        </TextBlock>
                     </Paragraph>
                 </FlowDocument>
             </RichTextBox>

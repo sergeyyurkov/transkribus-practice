@@ -54,6 +54,7 @@
     </Page>
     <Compile Include="Design\DesingViewModel.cs" />
     <Compile Include="Design\RectangleColorConverter.cs" />
+    <Compile Include="Design\RectangleContentConverter.cs" />
     <Compile Include="Design\RectangleRegionTemplateSelector.cs" />
     <Compile Include="Design\RectangleVisibilityConverter.cs" />
     <Compile Include="ExampleView.xaml.cs">

@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TranskribusPractice.BusinessDomain\TranskribusPractice.BusinessDomain.csproj" />
+    <ProjectReference Include="..\TranskribusPractice.Services\TranskribusPractice.Services.csproj" />
     <ProjectReference Include="..\TranskribusPractice.ViewModels\TranskribusPractice.ViewModels.csproj" />
   </ItemGroup>
 

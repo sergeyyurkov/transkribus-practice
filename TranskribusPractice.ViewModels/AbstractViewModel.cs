@@ -20,7 +20,7 @@ namespace TranskribusPractice.ViewModels
         public abstract ObservableCollection<RectangleRegion> AllRegions { get; set; }
         public abstract ObservableCollection<TextRegion> TextRegions { get; set; }
         public abstract ICommand SaveCommand { get; }
-        public abstract ICommand OpenCommand { get; }
+        public abstract ICommand OpenJpgFileCommand { get; }
         public abstract ICommand SaveAsCommand { get; }
         public abstract ICommand SetTextRegionModeCommand { get; }
         public abstract ICommand SetLineRegionModeCommand { get; }

@@ -18,7 +18,7 @@ namespace TranskribusPractice.BusinessDomain.AreaConcept
             {
                 if (_words == value) return;
                 _words = value;
-                //NotifyPropertyChanged();
+                NotifyPropertyChanged();
             }
         }
     }
