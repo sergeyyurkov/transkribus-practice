@@ -14,6 +14,7 @@ namespace TranskribusPractice.ViewModels.Implementations
         private string _textLeft;
         private string _textRight;
         private string _textSelected;
+        private string _jpgPath;
         private ObservableCollection<RectangleRegion> _allRegions;
         private ObservableCollection<TextRegion> _textRegions;
         private RelayCommand _openJpgFileCommand;
@@ -22,7 +23,16 @@ namespace TranskribusPractice.ViewModels.Implementations
         private RelayCommand _setWordRegionModeCommand;
         private RelayCommand _setSelectionModeCommand;
         private readonly IServiceProvider _serviceProvider = new ServiceProvider();
-        public override string JpgPath { get; set; } = "test.jpg";
+        public override string JpgPath
+        {
+            get => _jpgPath;
+            set
+            {
+                if (_jpgPath == value) return;
+                _jpgPath = value;
+                NotifyPropertyChanged();
+            }
+        }
         public override string TextLeft
         {
             get => _textLeft;
