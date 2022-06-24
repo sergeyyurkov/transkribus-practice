@@ -55,9 +55,12 @@ namespace TranskribusPractice.Services
                 projectPath = saveFileDialog.FileName;
             }
             XmlSerializer xs = new XmlSerializer(typeof(Project));
-            using (StreamWriter wr = new StreamWriter(projectPath))
+            if (projectPath != String.Empty)
             {
-                xs.Serialize(wr, project);
+                using (StreamWriter wr = new StreamWriter(projectPath))
+                {
+                    xs.Serialize(wr, project);
+                }
             }
             return projectPath;
         }
