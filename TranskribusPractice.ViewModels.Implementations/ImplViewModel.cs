@@ -10,7 +10,7 @@ using TranskribusPractice.ViewModels.Implementations.Commands;
 
 namespace TranskribusPractice.ViewModels.Implementations
 {
-    public partial class ImplViewModel : AbstractViewModel, IMouseAware
+    public partial class ImplViewModel : AbstractViewModel, IMouseAware, IKeyboardAware, IFocusAware
     {
         private string _jpgPath;
         private string _textLeft;
@@ -20,6 +20,7 @@ namespace TranskribusPractice.ViewModels.Implementations
         private ObservableCollection<RectangleRegion> _allRegions = new ObservableCollection<RectangleRegion>();
         private ObservableCollection<TextRegion> _textRegions = new ObservableCollection<TextRegion>();
         private RelayCommand _openJpgFileCommand;
+        private RelayCommand _createNewProjectCommand;
         private RelayCommand _openProjectFileCommand;
         private RelayCommand _saveProjectCommand;
         private RelayCommand _saveAsProjectCommand;
@@ -89,7 +90,6 @@ namespace TranskribusPractice.ViewModels.Implementations
                 NotifyPropertyChanged();
             }
         }
-      
         public override ICommand OpenJpgFileCommand
         {
             get => _openJpgFileCommand ??
@@ -101,6 +101,16 @@ namespace TranskribusPractice.ViewModels.Implementations
                         {
                             JpgPath = path;
                         }
+                    }));
+        }
+        public override ICommand CreateNewProjectCommand
+        {
+            get => _createNewProjectCommand ??
+                    (_createNewProjectCommand = new RelayCommand((o) =>
+                    {
+                        TextRegions.Clear();
+                        AllRegions.Clear();
+                        ProjectPath = string.Empty;
                     }));
         }
         public override ICommand OpenProjectFileCommand
@@ -140,6 +150,15 @@ namespace TranskribusPractice.ViewModels.Implementations
                                 textRegions.Add((TextRegion)text.Clone());
                             }
                             projectService.Save(ProjectPath, new Project(JpgPath, textRegions));
+                        }
+                        else if (JpgPath != string.Empty && JpgPath != null)
+                        {
+                            var textRegions = new ObservableCollection<TextRegion>();
+                            foreach (var text in TextRegions)
+                            {
+                                textRegions.Add((TextRegion)text.Clone());
+                            }
+                            ProjectPath = projectService.SaveAs(new Project(JpgPath, textRegions));
                         }
                     }));
         }
@@ -202,6 +221,37 @@ namespace TranskribusPractice.ViewModels.Implementations
             FillTextRegions();
             UpdateAllRegions();
             BuildRichTextBox();
+            TurnOnSelection();
+        }
+        public void DeleteSelectedRectangle()
+        {
+            if (SelectedRectangle is TextRegion)
+            {
+                TextRegions.Remove((TextRegion)SelectedRectangle);
+            }
+            if (SelectedRectangle is LineRegion)
+            {
+                foreach (var text in TextRegions)
+                {
+                    text.Lines.Remove((LineRegion)SelectedRectangle);
+                }
+            }
+            if (SelectedRectangle is WordRegion)
+            {
+                foreach (var text in TextRegions)
+                {
+                    foreach (var line in text.Lines)
+                    {
+                        line.Words.Remove((WordRegion)SelectedRectangle);
+                    }
+                }
+            }
+            SelectedRectangle = null;
+            UpdateAllRegions();
+        }
+        public void LoseFocus() 
+        {
+            SelectedRectangle = null;
         }
         private void TurnOffSelection() 
         {
@@ -235,7 +285,7 @@ namespace TranskribusPractice.ViewModels.Implementations
                 }
             }
         }
-        public void BuildRichTextBox()
+        private void BuildRichTextBox()
         {
             StringBuilder sbl = new StringBuilder();
             StringBuilder sbs = new StringBuilder();
@@ -378,7 +428,6 @@ namespace TranskribusPractice.ViewModels.Implementations
                     Y = 300,
                     Width = 20,
                     Height = 50,
-                    Lines = new ObservableCollection<LineRegion> { new LineRegion() { Name = "Line 3" }, new LineRegion() { Name = "Line 2" } }
                 },
                 new TextRegion()
                 {

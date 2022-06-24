@@ -14,7 +14,7 @@ namespace TranskribusPractice.ViewModels.Implementations
         private double _rectangleCanvasLeft;
         private double _rectangleCanvasTop;
         private bool _rectangleVisibility;
-        private Region _mode = Region.Text;
+        private Region _mode = Region.Undefined;
         private RectangleRegion _selectedRectangle;
         public override double RectangleWidth
         {
@@ -88,8 +88,9 @@ namespace TranskribusPractice.ViewModels.Implementations
         }
         public bool IsSmallRectangle()
         {
-            // TODO SystemParameters.MinimumHorizontalDragDistance 
-            if (RectangleWidth <= 4 || RectangleHeight <= 4)
+            int minimalDragDistance = SystemMetrics.GetMinimalDragDistance();
+            if (RectangleWidth <= minimalDragDistance
+                || RectangleHeight <= minimalDragDistance)
             {
                 return true;
             }
@@ -226,6 +227,7 @@ namespace TranskribusPractice.ViewModels.Implementations
             RectangleVisibility = false;
             if (IsSmallRectangle() || Mode == Region.Undefined)
             {
+                BuildRichTextBox();
                 return;
             }
             RegionCreator creator = new RegionCreator(

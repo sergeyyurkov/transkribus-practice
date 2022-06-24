@@ -36,6 +36,7 @@ namespace TranskribusPractice.Views.Design
             set => _textRegions = value;
         }
         public override ICommand OpenJpgFileCommand => null;
+        public override ICommand CreateNewProjectCommand => null;
         public override ICommand OpenProjectFileCommand => null;
         public override ICommand SaveProjectCommand => null;
         public override ICommand SaveAsProjectCommand => null;

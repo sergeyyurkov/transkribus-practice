@@ -25,7 +25,6 @@ namespace TranskribusPractice
         {
             InitializeComponent();
             _exampleView.DataContext = new ImplViewModel();
-            _exampleView.UpdateInfo();
         }
     }
 }
