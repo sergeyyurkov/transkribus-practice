@@ -12,5 +12,6 @@ namespace TranskribusPractice.Services
         string OpenProjectFile(out Project project);
         void Save(string path, Project project);
         string SaveAs(Project project);
+        void ShowError();
     }
 }

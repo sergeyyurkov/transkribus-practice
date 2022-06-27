@@ -7,7 +7,7 @@
         xmlns:views="clr-namespace:TranskribusPractice.Views;assembly=TranskribusPractice.Views"
         xmlns:vm="clr-namespace:TranskribusPractice.ViewModels.Implementations;assembly=TranskribusPractice.ViewModels.Implementations"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Transkribus" Height="450" Width="800">
     <Grid>
         <views:ExampleView x:Name="_exampleView"/>
     </Grid>

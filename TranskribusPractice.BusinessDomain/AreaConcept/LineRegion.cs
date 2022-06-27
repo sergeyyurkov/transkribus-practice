@@ -36,7 +36,7 @@ namespace TranskribusPractice.BusinessDomain.AreaConcept
                 Width = this.Width,
                 Height = this.Height,
                 Name = this.Name,
-                SelectionMode = false,
+                IsSelected = false,
                 Words = words
             };
         }

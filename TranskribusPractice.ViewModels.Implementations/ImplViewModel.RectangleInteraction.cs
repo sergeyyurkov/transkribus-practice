@@ -16,6 +16,7 @@ namespace TranskribusPractice.ViewModels.Implementations
         private bool _rectangleVisibility;
         private Region _mode = Region.Undefined;
         private RectangleRegion _selectedRectangle;
+        private RectangleRegion _previousSelectedRectangle;
         public override double RectangleWidth
         {
             get => _rectangleWidth;
@@ -81,8 +82,22 @@ namespace TranskribusPractice.ViewModels.Implementations
             get => _selectedRectangle;
             set
             {
+                //TODO refactor
                 if (_selectedRectangle == value) return;
+                if(_previousSelectedRectangle is null)
+                {
+                    _previousSelectedRectangle = value;
+                }
+                else 
+                {
+                    _previousSelectedRectangle.IsSelected = false;
+                    _previousSelectedRectangle = _selectedRectangle;
+                }
                 _selectedRectangle = value;
+                if (!(_selectedRectangle is null)) 
+                {
+                    _selectedRectangle.IsSelected = true;
+                }
                 NotifyPropertyChanged();
             }
         }

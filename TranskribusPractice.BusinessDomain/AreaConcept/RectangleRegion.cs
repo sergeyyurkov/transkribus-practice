@@ -9,7 +9,7 @@ namespace TranskribusPractice.BusinessDomain.AreaConcept
     public class RectangleRegion : INotifyPropertyChanged
     {
         private string _name;
-        private bool _selectionMode;
+        private bool _isSelected;
         public event PropertyChangedEventHandler PropertyChanged;
         public string Name
         {
@@ -28,13 +28,13 @@ namespace TranskribusPractice.BusinessDomain.AreaConcept
         public double Y { get; set; }
         public double Width { get; set; }
         public double Height { get; set; }
-        public  bool SelectionMode
+        public bool IsSelected
         {
-            get => _selectionMode;
+            get => _isSelected;
             set
             {
-                if (_selectionMode == value) return;
-                _selectionMode = value;
+                if (_isSelected == value) return;
+                _isSelected = value;
                 NotifyPropertyChanged();
             }
         }

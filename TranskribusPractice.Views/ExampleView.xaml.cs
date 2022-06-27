@@ -68,9 +68,8 @@ namespace TranskribusPractice.Views
 
         private void ListBoxRectangles_LostFocus(object sender, RoutedEventArgs e)
         {
-            var focusAware = _focusAware;
-            if (focusAware is null) return;
-            focusAware.LoseFocus();
+            //TODO refactor
+            //ListBoxRectangles.SelectedIndex = -1;
         }
     }
 }

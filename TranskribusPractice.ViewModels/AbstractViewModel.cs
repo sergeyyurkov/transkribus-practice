@@ -15,8 +15,9 @@ namespace TranskribusPractice.ViewModels
         public abstract double RectangleHeight { get; set; }
         public abstract double RectangleCanvasLeft { get; set; }
         public abstract double RectangleCanvasTop { get; set; }
-        public abstract Region Mode { get; set; }
+        public abstract bool IsFocusable { get; set; }
         public abstract bool RectangleVisibility { get; set; }
+        public abstract Region Mode { get; set; }
         public abstract RectangleRegion SelectedRectangle { get; set; }
         public abstract ObservableCollection<RectangleRegion> AllRegions { get; set; }
         public abstract ObservableCollection<TextRegion> TextRegions { get; set; }
