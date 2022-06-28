@@ -103,9 +103,8 @@ namespace TranskribusPractice.ViewModels.Implementations
         }
         public bool IsSmallRectangle()
         {
-            int minimalDragDistance = SystemMetrics.GetMinimalDragDistance();
-            if (RectangleWidth <= minimalDragDistance
-                || RectangleHeight <= minimalDragDistance)
+            if (RectangleWidth <= SystemMetrics.GetMinimalDragDistanceWidth()
+                || RectangleHeight <= SystemMetrics.GetMinimalDragDistanceHeight())
             {
                 return true;
             }

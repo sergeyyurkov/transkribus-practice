@@ -20,6 +20,7 @@ namespace TranskribusPractice.Views
     /// </summary>
     public partial class ExampleView : UserControl
     {
+        private int _lastSelectedRectangleIndex = -1;
         private ViewModels.IMouseAware _mouseAware;
         private ViewModels.IKeyboardAware _keyboardAware;
         private ViewModels.IFocusAware _focusAware;
@@ -39,21 +40,29 @@ namespace TranskribusPractice.Views
             var mouseAware = _mouseAware;
             if (mouseAware is null) return;
             var mousePosition = e.GetPosition(CanvasRectangleArea);
-            _mouseAware.RectangleMouseDown(mousePosition.X, mousePosition.Y);
+            _mouseAware.RectangleMouseDown(Math.Round(mousePosition.X, 2),
+             Math.Round(mousePosition.Y, 2));
         }
         public void ImageArea_MouseMove(object sender, MouseEventArgs e)
         {
             var mouseAware = _mouseAware;
             if (mouseAware is null) return;
             var mousePosition = e.GetPosition(CanvasRectangleArea);
-            _mouseAware.RectangleMouseMove(mousePosition.X, mousePosition.Y);
+            _mouseAware.RectangleMouseMove(Math.Round(mousePosition.X, 2),
+             Math.Round(mousePosition.Y, 2));
         }
         public void ImageArea_MouseUp(object sender, MouseButtonEventArgs e)
         {
             var mouseAware = _mouseAware;
             if (mouseAware is null) return;
+            if(_lastSelectedRectangleIndex == ListBoxRectangles.SelectedIndex) 
+            {
+                ListBoxRectangles.SelectedIndex = -1;
+            }
+            _lastSelectedRectangleIndex = ListBoxRectangles.SelectedIndex;
             var mousePosition = e.GetPosition(CanvasRectangleArea);
-            _mouseAware.RectangleMouseUp(mousePosition.X, mousePosition.Y);
+            _mouseAware.RectangleMouseUp(Math.Round(mousePosition.X, 2),
+                Math.Round(mousePosition.Y, 2));
         }
 
         private void ImageArea_KeyDown(object sender, KeyEventArgs e)
@@ -64,12 +73,6 @@ namespace TranskribusPractice.Views
             {
                 keyboardAware.DeleteSelectedRectangle();
             }
-        }
-
-        private void ListBoxRectangles_LostFocus(object sender, RoutedEventArgs e)
-        {
-            //TODO refactor
-            //ListBoxRectangles.SelectedIndex = -1;
         }
     }
 }

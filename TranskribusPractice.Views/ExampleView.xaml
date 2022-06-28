@@ -147,7 +147,7 @@
                       Background="Transparent"
                       PreviewMouseDown="ImageArea_MouseDown" 
                       MouseMove="ImageArea_MouseMove" 
-                      PreviewMouseUp="ImageArea_MouseUp"
+                      MouseUp="ImageArea_MouseUp"
                       KeyDown="ImageArea_KeyDown">
                     <Image Source="{Binding Path=JpgPath}"/>
                     <Canvas Background="Transparent" x:Name="CanvasRectangleArea">
@@ -173,8 +173,7 @@
                                BorderThickness="0"
                                Background="Transparent"
                                ItemsSource="{Binding AllRegions}"
-                               ItemTemplateSelector="{StaticResource rectangleRegionTemplateSelector}"
-                               LostFocus="ListBoxRectangles_LostFocus">
+                               ItemTemplateSelector="{StaticResource rectangleRegionTemplateSelector}">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="{x:Type ListBoxItem}">
                                 <Setter Property="Canvas.Left" Value="{Binding Path=X}"/>
