@@ -12,14 +12,16 @@ namespace TranskribusPractice.ViewModels.Implementations
 {
     public partial class ImplViewModel : AbstractViewModel, IMouseAware, IKeyboardAware, IFocusAware
     {
+        private const string DefaultProjectName = "new project.xml";
         private string _jpgPath;
         private string _textLeft;
         private string _textRight;
         private string _textSelected;
-        private bool _isFocusable;
+        private bool _isFocusable = true;
+        private bool _isNewProject = true;
         private ObservableCollection<RectangleRegion> _allRegions = new ObservableCollection<RectangleRegion>();
         private ObservableCollection<TextRegion> _textRegions = new ObservableCollection<TextRegion>();
-        private ObservableCollection<TextRegion> _savedTextRegions;
+        private ObservableCollection<TextRegion> _savedTextRegions = new ObservableCollection<TextRegion>();
         private RelayCommand _openJpgFileCommand;
         private RelayCommand _createNewProjectCommand;
         private RelayCommand _openProjectFileCommand;
@@ -40,7 +42,7 @@ namespace TranskribusPractice.ViewModels.Implementations
                 NotifyPropertyChanged();
             }
         }
-        public override string ProjectPath{ get; set; }
+        public override string ProjectPath { get; set; } = DefaultProjectName;
         public override string TextLeft
         {
             get => _textLeft;
@@ -116,87 +118,23 @@ namespace TranskribusPractice.ViewModels.Implementations
         }
         public override ICommand CreateNewProjectCommand
         {
-            //TODO add saved check
             get => _createNewProjectCommand ??
-                    (_createNewProjectCommand = new RelayCommand((o) =>
-                    {
-                        TextRegions.Clear();
-                        AllRegions.Clear();
-                        ProjectPath = string.Empty;
-                        JpgPath = string.Empty;
-                    }));
+                    (_createNewProjectCommand = new RelayCommand(CreateNewProjectCommandExecution));
         }
         public override ICommand OpenProjectFileCommand
         {
-            //TODO add saved check
             get => _openProjectFileCommand ??
-                    (_openProjectFileCommand = new RelayCommand((o) =>
-                    {
-                        var projectService = (IProjectService)_serviceProvider.GetService(typeof(IProjectService));
-                        Project project;
-                        string path = projectService.OpenProjectFile(out project);
-                        if ((path != string.Empty && path != null) && !(project is null)) 
-                        {
-                            ProjectPath = path;
-                            JpgPath = project.JpgPath;
-                            TextRegions = project.TextRegions;
-                            UpdateAllRegions();
-                            BuildRichTextBox();
-                        }
-                    }));
+                    (_openProjectFileCommand = new RelayCommand(OpenProjectFileCommandExecution));
         }
         public override ICommand SaveProjectCommand
         {
             get => _saveProjectCommand ??
-                    (_saveProjectCommand = new RelayCommand((o) =>
-                    {
-                        var projectService = (IProjectService)_serviceProvider.GetService(typeof(IProjectService));
-                        if ((ProjectPath != string.Empty && ProjectPath != null)
-                            && (JpgPath != string.Empty && JpgPath != null))
-                        {
-                            var copiedTextRegions = CopyTextRegions();
-                            projectService.Save(ProjectPath, new Project(JpgPath, copiedTextRegions));
-                            _savedTextRegions = copiedTextRegions;
-
-                        }
-                        else if (JpgPath != string.Empty && JpgPath != null)
-                        {
-                            var oldProjectPath = ProjectPath;
-                            var copiedTextRegions = CopyTextRegions();
-                            ProjectPath = projectService.SaveAs(new Project(JpgPath, copiedTextRegions));
-                            if(ProjectPath != oldProjectPath && oldProjectPath != string.Empty) 
-                            {
-                                _savedTextRegions = copiedTextRegions;
-                            }
-                        }
-                        else 
-                        {
-                            projectService.ShowError();
-                        }
-
-                    }));
+                    (_saveProjectCommand = new RelayCommand(SaveProjectCommandExecution));
         }
         public override ICommand SaveAsProjectCommand
         {
             get => _saveAsProjectCommand ??
-                    (_saveAsProjectCommand = new RelayCommand((o) =>
-                    {
-                        var projectService = (IProjectService)_serviceProvider.GetService(typeof(IProjectService));
-                        if (JpgPath != string.Empty && JpgPath != null) 
-                        {
-                            var oldProjectPath = ProjectPath;
-                            var copiedTextRegions = CopyTextRegions();
-                            ProjectPath = projectService.SaveAs(new Project(JpgPath, copiedTextRegions));
-                            if (ProjectPath != oldProjectPath && oldProjectPath != string.Empty)
-                            {
-                                _savedTextRegions = copiedTextRegions;
-                            }
-                        }
-                        else 
-                        {
-                            projectService.ShowError();
-                        }
-                    }));
+                    (_saveAsProjectCommand = new RelayCommand(SaveAsProjectCommandExecution));
         }
         public override ICommand SetTextRegionModeCommand
         {
@@ -235,39 +173,103 @@ namespace TranskribusPractice.ViewModels.Implementations
                         Mode = Region.Undefined;
                     }));
         }
-        public ImplViewModel() 
+        private void CreateNewProjectCommandExecution(object param)
         {
-            IsFocusable = true;
-        }
-        public void DeleteSelectedRectangle()
-        {
-            if (SelectedRectangle is TextRegion)
+            var projectService = (IProjectService)_serviceProvider.GetService(typeof(IProjectService));
+            if (!IsSaved())
             {
-                TextRegions.Remove((TextRegion)SelectedRectangle);
-            }
-            if (SelectedRectangle is LineRegion)
-            {
-                foreach (var text in TextRegions)
+                var result = projectService.ShowNotSavedWarning(ProjectPath);
+                if (result == CustomMessageBoxResult.Yes)
                 {
-                    text.Lines.Remove((LineRegion)SelectedRectangle);
+                    SaveProjectCommandExecution(null);
+                }
+                else if (result == CustomMessageBoxResult.Cancel) 
+                {
+                    return;
                 }
             }
-            if (SelectedRectangle is WordRegion)
+            _isNewProject = true;
+            _savedTextRegions.Clear();
+            TextRegions.Clear();
+            AllRegions.Clear();
+            ProjectPath = DefaultProjectName;
+            JpgPath = string.Empty;
+        }
+        private void OpenProjectFileCommandExecution(object param)
+        {
+            var projectService = (IProjectService)_serviceProvider.GetService(typeof(IProjectService));
+            if (!IsSaved())
             {
-                foreach (var text in TextRegions)
+                var result = projectService.ShowNotSavedWarning(ProjectPath);
+                if (result == CustomMessageBoxResult.Yes)
                 {
-                    foreach (var line in text.Lines)
-                    {
-                        line.Words.Remove((WordRegion)SelectedRectangle);
-                    }
+                    SaveProjectCommandExecution(null);
+                }
+                else if (result == CustomMessageBoxResult.Cancel)
+                {
+                    return;
                 }
             }
-            SelectedRectangle = null;
-            UpdateAllRegions();
+            Project project;
+            string path = projectService.OpenProjectFile(out project);
+            if ((path != string.Empty && path != null) && !(project is null))
+            {
+                _savedTextRegions.Clear();
+                ProjectPath = path;
+                JpgPath = project.JpgPath;
+                TextRegions = project.TextRegions;
+                UpdateAllRegions();
+                BuildRichTextBox();
+            }
         }
-        public void LoseFocus() 
+        private void SaveProjectCommandExecution(object param) 
         {
-            SelectedRectangle = null;
+            var projectService = (IProjectService)_serviceProvider.GetService(typeof(IProjectService));
+            if ((ProjectPath != string.Empty && ProjectPath != null)
+                && (JpgPath != string.Empty && JpgPath != null))
+            {
+                var copiedTextRegions = CopyTextRegions();
+                if (_isNewProject)
+                {
+                    _isNewProject = !SaveAsProject(projectService);
+                }
+                else
+                {
+                    projectService.Save(ProjectPath, new Project(JpgPath, copiedTextRegions));
+                }
+                _savedTextRegions = copiedTextRegions;
+            }
+            else if (JpgPath != string.Empty && JpgPath != null)
+            {
+                SaveAsProject(projectService);
+            }
+            else
+            {
+                projectService.ShowError();
+            }
+        }
+        private void SaveAsProjectCommandExecution(object param)
+        {
+            var projectService = (IProjectService)_serviceProvider.GetService(typeof(IProjectService));
+            if (JpgPath != string.Empty && JpgPath != null)
+            {
+                SaveAsProject(projectService);
+            }
+            else
+            {
+                projectService.ShowError();
+            }
+        }
+        private bool SaveAsProject(IProjectService projectService) 
+        {
+            bool isSaved;
+            var copiedTextRegions = CopyTextRegions();
+            (isSaved, ProjectPath) = projectService.SaveAs(ProjectPath, new Project(JpgPath, copiedTextRegions));
+            if (isSaved)
+            {
+                _savedTextRegions = copiedTextRegions;
+            }
+            return isSaved;
         }
         private bool IsSaved() 
         {
@@ -299,7 +301,6 @@ namespace TranskribusPractice.ViewModels.Implementations
             }
             return true;
         }
-       
         private ObservableCollection<TextRegion> CopyTextRegions() 
         {
             var textRegions = new ObservableCollection<TextRegion>();
@@ -409,75 +410,36 @@ namespace TranskribusPractice.ViewModels.Implementations
             TextSelected = sbs.ToString();
             TextRight = sbr.ToString();
         }
-        private void FillTextRegions()
+        public ImplViewModel() { }
+        public void DeleteSelectedRectangle()
         {
-            TextRegions = new ObservableCollection<TextRegion>()
+            if (SelectedRectangle is TextRegion tr)
             {
-                new TextRegion()
+                TextRegions.Remove(tr);
+            }
+            else if (SelectedRectangle is LineRegion lr)
+            {
+                foreach (var text in TextRegions)
                 {
-                    Name = "Text region 1",
-                    X = 100,
-                    Y = 200,
-                    Width = 50,
-                    Height = 70,
-                    Lines = new ObservableCollection<LineRegion>
-                    {
-                        new LineRegion()
-                        {
-                            Name = "Line 1",
-                            X = 20,
-                            Y = 20,
-                            Width = 33,
-                            Height = 22,
-                            Words = new ObservableCollection<WordRegion>()
-                            {
-                                new WordRegion()
-                                {
-                                    Name = "Word 1",
-                                    X = 60,
-                                    Y = 20,
-                                    Width = 44,
-                                    Height = 55,
-                                    Content = "Word 11111"
-                                },
-                                new WordRegion()
-                                {
-                                    Name = "Word 2",
-                                    X = 50,
-                                    Y = 20,
-                                    Width = 44,
-                                    Height = 55,
-                                    Content = "Word 22222"
-                                }
-                            }
-                        },
-                        new LineRegion()
-                        {
-                            Name = "Line 2",
-                            X = 170,
-                            Y = 200,
-                            Width = 20,
-                            Height = 50
-                        }
-                    }
-                },
-                new TextRegion()
-                {
-                    Name = "Text region 2",
-                    X = 150,
-                    Y = 300,
-                    Width = 20,
-                    Height = 50,
-                },
-                new TextRegion()
-                {
-                    Name = "Text region 3",
-                    X = 150,
-                    Y = 150,
-                    Width = 60,
-                    Height = 30,
+                    text.Lines.Remove(lr);
                 }
-            };
+            }
+            else if (SelectedRectangle is WordRegion wr)
+            {
+                foreach (var text in TextRegions)
+                {
+                    foreach (var line in text.Lines)
+                    {
+                        line.Words.Remove(wr);
+                    }
+                }
+            }
+            SelectedRectangle = null;
+            UpdateAllRegions();
+        }
+        public void LoseFocus() 
+        {
+            SelectedRectangle = null;
         }
     }
 }

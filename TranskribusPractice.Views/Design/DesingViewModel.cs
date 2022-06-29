@@ -11,7 +11,6 @@ namespace TranskribusPractice.Views.Design
 {
     internal class DesingViewModel : ViewModels.AbstractViewModel
     {
-        private ObservableCollection<RectangleRegion> _allRegions;
         private ObservableCollection<TextRegion> _textRegions;
         public override string JpgPath { get; set; } = "test.jpg";
         public override string ProjectPath { get ; set; } = "test.xml";
@@ -26,11 +25,45 @@ namespace TranskribusPractice.Views.Design
         public override bool IsFocusable { get; set; }
         public override bool RectangleVisibility { get; set; }
         public override RectangleRegion SelectedRectangle { get; set; }
-        public override ObservableCollection<RectangleRegion> AllRegions
+        public override ObservableCollection<RectangleRegion> AllRegions { get; set; } = new ObservableCollection<RectangleRegion>()
         {
-            get => _allRegions ?? (_allRegions = new ObservableCollection<RectangleRegion>());
-            set => _allRegions = value;
-        }
+            new TextRegion()
+            {
+                Name = "Paragraph 1",
+                Lines = new ObservableCollection<LineRegion>
+                {
+                    new LineRegion()
+                    {
+                        Name = "Line 1",
+                        Words = new ObservableCollection<WordRegion>()
+                        {
+                            new WordRegion()
+                            {
+                                Name = "Word 1",
+                                Content = "Word 11111"
+                            },
+                            new WordRegion()
+                            {
+                                Name = "Word 2",
+                                Content = "Word 22222"
+                            }
+                        }
+                    },
+                    new LineRegion()
+                    {
+                        Name = "Line 2",
+                    }
+                }
+            },
+            new TextRegion()
+            {
+                Name = "Paragraph 2",
+            },
+            new TextRegion()
+            {
+                Name = "Paragraph 3",
+            }
+        };
         public override ObservableCollection<TextRegion> TextRegions 
         {
             get => _textRegions ?? (_textRegions = new ObservableCollection<TextRegion>());

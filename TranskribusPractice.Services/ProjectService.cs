@@ -47,32 +47,56 @@ namespace TranskribusPractice.Services
             }
         }
 
-        public string SaveAs(Project project)
+        public (bool, string) SaveAs(string oldProjectPath, Project project)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog()
             {
+                FileName = oldProjectPath,
                 Filter = "project (*.xml)|*.xml",
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
             };
-            string projectPath = string.Empty;
+            string newProjectPath = string.Empty;
             if (saveFileDialog.ShowDialog() == true)
             {
-                projectPath = saveFileDialog.FileName;
+                newProjectPath = saveFileDialog.FileName;
+            }
+            else 
+            {
+                return (false, oldProjectPath);
             }
             XmlSerializer xs = new XmlSerializer(typeof(Project));
-            if (projectPath != String.Empty)
+            if (newProjectPath != String.Empty)
             {
-                using (StreamWriter wr = new StreamWriter(projectPath))
+                using (StreamWriter wr = new StreamWriter(newProjectPath))
                 {
                     xs.Serialize(wr, project);
                 }
             }
-            return projectPath;
+            else 
+            {
+                return (false, oldProjectPath);
+            }
+            return (true, newProjectPath);
         }
 
         public void ShowError()
         {
             MessageBox.Show("You can't save the project without choosing an image.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        public CustomMessageBoxResult ShowNotSavedWarning(string projectFileName)
+        {
+            var result = MessageBox.Show("Do you want to save changes to \"" + projectFileName+ '\"',
+                                 "Warning",
+                                 MessageBoxButton.YesNoCancel,
+                                 MessageBoxImage.Question);
+            switch (result) 
+            {
+                case MessageBoxResult.Yes: return CustomMessageBoxResult.Yes;
+                case MessageBoxResult.No: return CustomMessageBoxResult.No;
+                case MessageBoxResult.Cancel: return CustomMessageBoxResult.Cancel;
+                default: return CustomMessageBoxResult.Cancel;
+            }
         }
     }
 }
