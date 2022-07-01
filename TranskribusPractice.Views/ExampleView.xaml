@@ -14,35 +14,20 @@
         <design:RectangleColorConverter x:Key="rectangleColorConverter"/>
         <design:RectangleVisibilityConverter x:Key="rectangleVisibilityConverter"/>
         <design:RectangleContentConverter x:Key="rectangleContentConverter"/>
-        <design:SelectedRectangleConverter x:Key="selectedRectangleConverter"/>
         <design:StringToBoolConverter x:Key="stringToBoolConverter"/>
         <DataTemplate x:Key="Word">
-            <TextBlock Text="{Binding Name}" />
+            <TextBlock Text="{Binding Name}"/>
         </DataTemplate>
         <HierarchicalDataTemplate x:Key="Line"                    
-            ItemsSource="{Binding Path=Words}"
-            ItemTemplate="{StaticResource Word}">
-            <TextBlock Text="{Binding Name}" />
+                                  ItemsSource="{Binding Path=Words}"
+                                  ItemTemplate="{StaticResource Word}">
+            <TextBlock Text="{Binding Name}"/>
         </HierarchicalDataTemplate>
         <HierarchicalDataTemplate x:Key="Text"
-            ItemsSource="{Binding Path=Lines}"
-            ItemTemplate="{StaticResource Line}">
-            <TextBlock Text="{Binding Name}" />
+                                  ItemsSource="{Binding Path=Lines}"
+                                  ItemTemplate="{StaticResource Line}">
+            <TextBlock Text="{Binding Name}"/>
         </HierarchicalDataTemplate>
-        <HierarchicalDataTemplate x:Key="level1"
-            ItemsSource="{Binding Path=TextRegions}"
-            ItemTemplate="{StaticResource Text}">
-            <TextBlock Text="{Binding Name}" />
-        </HierarchicalDataTemplate>
-        <!-- -->
-        <Style TargetType="Border" x:Key="RectangleChosenBorder">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentControl}}, Path=IsSelected}" Value="True">
-                    <Setter  Property="Border.BorderThickness" Value="2"/>
-                    <Setter  Property="Border.BorderBrush" Value="Black"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
         <Style TargetType="Rectangle" x:Key="RectangleMouseOver">
             <Setter Property="Opacity" Value="0.3"/>
             <Style.Triggers>
@@ -54,34 +39,28 @@
         <DataTemplate x:Key="TextTemplate" DataType="{x:Type area:TextRegion}">
             <Grid Background="Transparent">
                 <Rectangle x:Name="UITextRectangle"
-                Width="{Binding Width}"
-                Height="{Binding Height}"
-                Fill="Red"
-                Style="{StaticResource RectangleMouseOver}"/>
-                <Border Name="border" Style="{StaticResource RectangleChosenBorder}"/>
-                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                           Width="{Binding Width}"
+                           Height="{Binding Height}"
+                           Fill="Red"
+                           Style="{StaticResource RectangleMouseOver}"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="LineTemplate" DataType="{x:Type area:LineRegion}">
             <Grid Background="Transparent">
                 <Rectangle x:Name="UILineRectangle"
-                Width="{Binding Width}"
-                Height="{Binding Height}"
-                Fill="Blue"
-                Style="{StaticResource RectangleMouseOver}"/>
-                <Border Name="border"  Style="{StaticResource RectangleChosenBorder}"/>
-                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                           Width="{Binding Width}"
+                           Height="{Binding Height}"
+                           Fill="Blue"
+                           Style="{StaticResource RectangleMouseOver}"/>
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="WordTemplate" DataType="{x:Type area:WordRegion}">
             <Grid  Background="Transparent">
                 <Rectangle x:Name="UIWordRectangle"
-                Width="{Binding Width}"
-                Height="{Binding Height}"
-                Fill="Green"
-                Style="{StaticResource RectangleMouseOver}"/>
-                <Border Name="border" Style="{StaticResource RectangleChosenBorder}"/>
-                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                           Width="{Binding Width}"
+                           Height="{Binding Height}"
+                           Fill="Green"
+                           Style="{StaticResource RectangleMouseOver}"/>
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
@@ -101,11 +80,6 @@
         </DockPanel>
         <StackPanel DockPanel.Dock="Left">
             <ItemsControl VerticalAlignment="Top">
-                <ItemsControl.ItemContainerStyle>
-                    <Style>
-                        <Setter Property="FrameworkElement.Margin" Value="5"/>
-                    </Style>
-                </ItemsControl.ItemContainerStyle>
                 <RadioButton Content="Selection" Command="{Binding SetSelectionModeCommand}" Style="{StaticResource {x:Type ToggleButton}}" IsChecked="True"
                              IsEnabled="{Binding JpgPath, Converter={StaticResource stringToBoolConverter}}"/>
                 <RadioButton Content="Text" Command="{Binding SetTextRegionModeCommand}" Style="{StaticResource {x:Type ToggleButton}}"
@@ -116,10 +90,10 @@
                              IsEnabled="{Binding JpgPath, Converter={StaticResource stringToBoolConverter}}"/>
             </ItemsControl>
         </StackPanel>
-        <Grid Background="Gray">
+        <Grid Background="Gray" UseLayoutRounding="True">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="3"/>
+                <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="7*"/>
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
@@ -130,18 +104,11 @@
             <TreeView x:Name="TreeViewRectangles" Grid.Column="0" Grid.RowSpan="2" ItemsSource="{Binding TextRegions}" ItemTemplate="{StaticResource Text}">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}">
-                        <Setter Property="IsExpanded" Value="{Binding IsSelected}"/>
                         <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
-                        <!--<Style.Triggers>-->
-                            <!--<DataTrigger Binding="{Binding Path=IsSelected}" Value="True">
-                               <Setter 
-                            </DataTrigger>
-                        </Style.Triggers>-->
                     </Style>
                 </TreeView.ItemContainerStyle>
-               
             </TreeView>
-            <GridSplitter Grid.Column="1" Grid.RowSpan="2" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+            <GridSplitter Grid.Column="1" Grid.RowSpan="2" Width="5"  HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
             <ScrollViewer Grid.Column="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                 <Grid x:Name="GridImageArea"
                       Background="Transparent"
@@ -167,39 +134,52 @@
                             </Rectangle.Style>
                         </Rectangle>
                     </Canvas>
-                               <!--SelectedItem="{Binding ElementName=TreeViewRectangles, Path=SelectedItem, Mode=OneWay}"-->
-                      <ListBox x:Name="ListBoxRectangles"
-                               Padding="-1"
-                               BorderThickness="0"
-                               Background="Transparent"
-                               ItemsSource="{Binding AllRegions}"
-                               ItemTemplateSelector="{StaticResource rectangleRegionTemplateSelector}">
+                    <ListBox x:Name="ListBoxRectangles"
+                             Background="Transparent"
+                             ItemsSource="{Binding AllRegions}"
+                             ItemTemplateSelector="{StaticResource rectangleRegionTemplateSelector}">
+                        <ListBox.Style >
+                            <Style TargetType="{x:Type ListBox}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type ListBox}">
+                                            <Border  Padding="0">
+                                                <ScrollViewer Focusable="false" Padding="{TemplateBinding Padding}">
+                                                    <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                </ScrollViewer>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.Style>
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="{x:Type ListBoxItem}">
                                 <Setter Property="Canvas.Left" Value="{Binding Path=X}"/>
                                 <Setter Property="Canvas.Top" Value="{Binding Path=Y}"/>
                                 <Setter Property="Width" Value="{Binding Width}"/>
                                 <Setter Property="Height" Value="{Binding Height}"/>
-                                <!--<Setter Property="Focusable" Value="{Binding Path=DataContext.IsFocusable, RelativeSource={RelativeSource AncestorType=ListBox}}"/>-->
                                 <Setter Property="IsHitTestVisible" Value="{Binding Path=DataContext.IsFocusable, RelativeSource={RelativeSource AncestorType=ListBox}}" />
+                                <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
                                 <Setter Property="Margin" Value="0"/>
                                 <Setter Property="Padding" Value="0"/>
                                 <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border x:Name="border" BorderBrush="Black">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter TargetName="border" Property="BorderThickness" Value="2"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
                             </Style>
                         </ListBox.ItemContainerStyle>
-                        <ListBox.SelectedItem>
-                            <MultiBinding Converter="{StaticResource selectedRectangleConverter}">
-                                <Binding Path="SelectedRectangle" Mode="TwoWay"/>
-                                <Binding ElementName="TreeViewRectangles" Path="SelectedItem" Mode="OneWay"/>
-                                <!--<Binding Path="SelecteItem"/>-->         
-                                <!--<Binding Path=""/>-->
-                            </MultiBinding>
-                        </ListBox.SelectedItem>
-                        <!--<ListBox.Triggers>
-                            <DataTrigger Binding="{Binding ElementName=TreeViewRectangles, Path=SelectedItem.IsSelected}" Value="True">
-                                <Setter Property="" />
-                            </DataTrigger>
-                        </ListBox.Triggers>-->
                         <ListBox.ItemsPanel >
                             <ItemsPanelTemplate>
                                 <Canvas IsItemsHost="True" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>

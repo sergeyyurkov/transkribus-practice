@@ -57,7 +57,6 @@
     <Compile Include="Design\RectangleContentConverter.cs" />
     <Compile Include="Design\RectangleRegionTemplateSelector.cs" />
     <Compile Include="Design\RectangleVisibilityConverter.cs" />
-    <Compile Include="Design\SelectedRectangleConverter.cs" />
     <Compile Include="Design\StringToBoolConverter.cs" />
     <Compile Include="ExampleView.xaml.cs">
       <DependentUpon>ExampleView.xaml</DependentUpon>

@@ -214,10 +214,11 @@ namespace TranskribusPractice.ViewModels.Implementations
             string path = projectService.OpenProjectFile(out project);
             if ((path != string.Empty && path != null) && !(project is null))
             {
-                _savedTextRegions.Clear();
                 ProjectPath = path;
                 JpgPath = project.JpgPath;
+                _savedTextRegions = project.TextRegions;
                 TextRegions = project.TextRegions;
+                _isNewProject = false;
                 UpdateAllRegions();
                 BuildRichTextBox();
             }

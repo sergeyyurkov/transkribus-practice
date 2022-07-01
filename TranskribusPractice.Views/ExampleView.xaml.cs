@@ -40,16 +40,14 @@ namespace TranskribusPractice.Views
             var mouseAware = _mouseAware;
             if (mouseAware is null) return;
             var mousePosition = e.GetPosition(CanvasRectangleArea);
-            _mouseAware.RectangleMouseDown(Math.Round(mousePosition.X, 2),
-             Math.Round(mousePosition.Y, 2));
+            _mouseAware.RectangleMouseDown(mousePosition.X,mousePosition.Y);
         }
         public void ImageArea_MouseMove(object sender, MouseEventArgs e)
         {
             var mouseAware = _mouseAware;
             if (mouseAware is null) return;
             var mousePosition = e.GetPosition(CanvasRectangleArea);
-            _mouseAware.RectangleMouseMove(Math.Round(mousePosition.X, 2),
-             Math.Round(mousePosition.Y, 2));
+            _mouseAware.RectangleMouseMove(mousePosition.X, mousePosition.Y);
         }
         public void ImageArea_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -61,8 +59,7 @@ namespace TranskribusPractice.Views
             }
             _lastSelectedRectangleIndex = ListBoxRectangles.SelectedIndex;
             var mousePosition = e.GetPosition(CanvasRectangleArea);
-            _mouseAware.RectangleMouseUp(Math.Round(mousePosition.X, 2),
-                Math.Round(mousePosition.Y, 2));
+            _mouseAware.RectangleMouseUp(mousePosition.X, mousePosition.Y);
         }
 
         private void ImageArea_KeyDown(object sender, KeyEventArgs e)

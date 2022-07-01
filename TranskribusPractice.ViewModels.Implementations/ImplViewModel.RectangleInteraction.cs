@@ -16,7 +16,6 @@ namespace TranskribusPractice.ViewModels.Implementations
         private bool _rectangleVisibility;
         private Region _mode = Region.Undefined;
         private RectangleRegion _selectedRectangle;
-        private RectangleRegion _previousSelectedRectangle;
         public override double RectangleWidth
         {
             get => _rectangleWidth;
@@ -82,22 +81,8 @@ namespace TranskribusPractice.ViewModels.Implementations
             get => _selectedRectangle;
             set
             {
-                //TODO refactor
                 if (_selectedRectangle == value) return;
-                if(_previousSelectedRectangle is null)
-                {
-                    _previousSelectedRectangle = value;
-                }
-                else 
-                {
-                    _previousSelectedRectangle.IsSelected = false;
-                    _previousSelectedRectangle = _selectedRectangle;
-                }
                 _selectedRectangle = value;
-                if (!(_selectedRectangle is null)) 
-                {
-                    _selectedRectangle.IsSelected = true;
-                }
                 NotifyPropertyChanged();
             }
         }
@@ -252,22 +237,35 @@ namespace TranskribusPractice.ViewModels.Implementations
             switch (Mode)
             {
                 case Region.Text:
-                    TextRegions.Add(
-                        creator.CreateTextRegion("Paragraph " + (TextRegions.Count + 1)));
+                    var tr = creator.CreateTextRegion("Paragraph " + (TextRegions.Count + 1));
+                    tr.SelectRegion += SelectRegion;
+                    TextRegions.Add(tr);
                     break;
                 case Region.Line:
-                    TextRegion ParentTextRegion = DefineParentText();
-                    ParentTextRegion?.Lines.Add(
-                        creator.CreateLineRegion("Line " + (ParentTextRegion.Lines.Count + 1)));
+                    var ParentTextRegion = DefineParentText();
+                    if(!(ParentTextRegion is null))
+                    {
+                        var lr = creator.CreateLineRegion("Line " + (ParentTextRegion.Lines.Count + 1));
+                        lr.SelectRegion += SelectRegion;
+                        ParentTextRegion?.Lines.Add(lr);
+                    }
                     break;
                 case Region.Word:
-                    LineRegion ParentLineRegion = DefineParentLine();
-                    ParentLineRegion?.Words.Add(
-                        creator.CreateWordRegion("Word " + (ParentLineRegion.Words.Count + 1)));
+                    var ParentLineRegion = DefineParentLine();
+                    if (!(ParentLineRegion is null))
+                    { 
+                        var wr = creator.CreateWordRegion("Word " + (ParentLineRegion.Words.Count + 1));
+                        wr.SelectRegion += SelectRegion;
+                        ParentLineRegion?.Words.Add(wr);
+                    }
                     break;
                 default: break;
             }
             UpdateAllRegions();
+        }
+        public void SelectRegion(object sender, EventArgs e)
+        {
+            SelectedRectangle = sender as RectangleRegion;
             BuildRichTextBox();
         }
     }

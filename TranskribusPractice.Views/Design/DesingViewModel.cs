@@ -11,7 +11,6 @@ namespace TranskribusPractice.Views.Design
 {
     internal class DesingViewModel : ViewModels.AbstractViewModel
     {
-        private ObservableCollection<TextRegion> _textRegions;
         public override string JpgPath { get; set; } = "test.jpg";
         public override string ProjectPath { get ; set; } = "test.xml";
         public override string TextLeft { get; set; } = "Example Text Left";
@@ -24,8 +23,9 @@ namespace TranskribusPractice.Views.Design
         public override Region Mode { get; set; }
         public override bool IsFocusable { get; set; }
         public override bool RectangleVisibility { get; set; }
-        public override RectangleRegion SelectedRectangle { get; set; }
-        public override ObservableCollection<RectangleRegion> AllRegions { get; set; } = new ObservableCollection<RectangleRegion>()
+        public override RectangleRegion SelectedRectangle { get; set; } 
+        public override ObservableCollection<RectangleRegion> AllRegions { get; set; }
+        public override ObservableCollection<TextRegion> TextRegions { get; set; } = new ObservableCollection<TextRegion>()
         {
             new TextRegion()
             {
@@ -64,11 +64,6 @@ namespace TranskribusPractice.Views.Design
                 Name = "Paragraph 3",
             }
         };
-        public override ObservableCollection<TextRegion> TextRegions 
-        {
-            get => _textRegions ?? (_textRegions = new ObservableCollection<TextRegion>());
-            set => _textRegions = value;
-        }
         public override ICommand OpenJpgFileCommand => null;
         public override ICommand CreateNewProjectCommand => null;
         public override ICommand OpenProjectFileCommand => null;

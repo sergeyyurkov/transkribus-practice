@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace TranskribusPractice.BusinessDomain.AreaConcept 
 {
@@ -10,6 +11,7 @@ namespace TranskribusPractice.BusinessDomain.AreaConcept
     {
         private string _name;
         private bool _isSelected;
+        public event EventHandler SelectRegion;
         public event PropertyChangedEventHandler PropertyChanged;
         public string Name
         {
@@ -28,6 +30,7 @@ namespace TranskribusPractice.BusinessDomain.AreaConcept
         public double Y { get; set; }
         public double Width { get; set; }
         public double Height { get; set; }
+        [XmlIgnore]
         public bool IsSelected
         {
             get => _isSelected;
@@ -36,6 +39,10 @@ namespace TranskribusPractice.BusinessDomain.AreaConcept
                 if (_isSelected == value) return;
                 _isSelected = value;
                 NotifyPropertyChanged();
+                if (_isSelected)
+                {
+                    SelectRegion?.Invoke(this, EventArgs.Empty);
+                }
             }
         }
         protected void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
