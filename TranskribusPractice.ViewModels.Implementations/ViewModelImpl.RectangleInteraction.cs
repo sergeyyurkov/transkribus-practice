@@ -5,7 +5,7 @@ using TranskribusPractice.BusinessDomain.AreaConcept;
 
 namespace TranskribusPractice.ViewModels.Implementations
 {
-    public partial class ImplViewModel
+    public partial class ViewModelImpl 
     {
         private double _startX;
         private double _startY;

@@ -3,12 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:local="clr-namespace:TranskribusPractice"
         xmlns:views="clr-namespace:TranskribusPractice.Views;assembly=TranskribusPractice.Views"
         xmlns:vm="clr-namespace:TranskribusPractice.ViewModels.Implementations;assembly=TranskribusPractice.ViewModels.Implementations"
         mc:Ignorable="d"
-        Title="Transkribus" Height="450" Width="800">
+        Title="Transkribus" Height="450" Width="800" Closing="Window_Closing">
     <Grid>
-        <views:ExampleView x:Name="_exampleView"/>
+        <views:MainView x:Name="_mainView"/>
     </Grid>
 </Window>

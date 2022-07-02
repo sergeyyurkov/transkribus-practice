@@ -73,5 +73,7 @@ namespace TranskribusPractice.Views.Design
         public override ICommand SetLineRegionModeCommand => null;
         public override ICommand SetWordRegionModeCommand => null;
         public override ICommand SetSelectionModeCommand => null;
+        public override ICommand DeleteSelectedRectangleCommand => null;
+        public override ICommand ClosingWindowCommand => null;
     }
 }

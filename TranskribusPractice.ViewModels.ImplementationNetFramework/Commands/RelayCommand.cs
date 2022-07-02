@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Input;
 
-namespace TranskribusPractice.ViewModels.Implementations.Commands
+namespace TranskribusPractice.ViewModels.ImplementationsNetFramework.Commands
 {
     public class RelayCommand<T> : ICommand
     {

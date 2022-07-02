@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TranskribusPractice.ViewModels.Implementations;
-
+using TranskribusPractice.ViewModels.ImplementationsNetFramework;
 namespace TranskribusPractice
 {
     /// <summary>
@@ -24,7 +24,13 @@ namespace TranskribusPractice
         public MainWindow()
         {
             InitializeComponent();
-            _exampleView.DataContext = new ImplViewModel();
+            _mainView.DataContext = new ViewModels.ImplementationsNetFramework.ViewModelImpl();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var viewModelImpl = _mainView.DataContext as ViewModels.ImplementationsNetFramework.ViewModelImpl;
+            viewModelImpl?.ClosingWindowCommand?.Execute(e);
         }
     }
 }

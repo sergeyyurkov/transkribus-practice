@@ -12,28 +12,24 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Xaml.Behaviors;
 
 namespace TranskribusPractice.Views
 {
     /// <summary>
     /// Interaction logic for ExampleView.xaml
     /// </summary>
-    public partial class ExampleView : UserControl
+    public partial class MainView : UserControl
     {
         private int _lastSelectedRectangleIndex = -1;
         private ViewModels.IMouseAware _mouseAware;
-        private ViewModels.IKeyboardAware _keyboardAware;
-        private ViewModels.IFocusAware _focusAware;
-        public ExampleView()
+        public MainView()
         {
             InitializeComponent();
-
         }
         private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             _mouseAware = DataContext as ViewModels.IMouseAware;
-            _keyboardAware = DataContext as ViewModels.IKeyboardAware;
-            _focusAware = DataContext as ViewModels.IFocusAware;
         }
         public void ImageArea_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -60,16 +56,6 @@ namespace TranskribusPractice.Views
             _lastSelectedRectangleIndex = ListBoxRectangles.SelectedIndex;
             var mousePosition = e.GetPosition(CanvasRectangleArea);
             _mouseAware.RectangleMouseUp(mousePosition.X, mousePosition.Y);
-        }
-
-        private void ImageArea_KeyDown(object sender, KeyEventArgs e)
-        {
-            var keyboardAware = _keyboardAware;
-            if (keyboardAware is null) return;
-            if (e.Key == Key.Delete || e.Key == Key.Back)
-            {
-                keyboardAware.DeleteSelectedRectangle();
-            }
         }
     }
 }

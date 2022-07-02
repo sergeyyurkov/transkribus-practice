@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.39\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -86,6 +89,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -95,6 +99,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TranskribusPractice.ViewModels.ImplementationNetFramework\TranskribusPractice.ViewModels.ImplementationNetFramework.csproj">
+      <Project>{7bd57977-575b-4703-94b7-257869b0f492}</Project>
+      <Name>TranskribusPractice.ViewModels.ImplementationNetFramework</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TranskribusPractice.ViewModels.Implementations\TranskribusPractice.ViewModels.Implementations.csproj">
       <Project>{92879a8e-0bbc-45b0-affa-39a3b66f0bd5}</Project>
       <Name>TranskribusPractice.ViewModels.Implementations</Name>

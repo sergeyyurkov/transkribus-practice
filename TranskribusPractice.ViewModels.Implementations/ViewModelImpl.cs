@@ -10,7 +10,7 @@ using TranskribusPractice.ViewModels.Implementations.Commands;
 
 namespace TranskribusPractice.ViewModels.Implementations
 {
-    public partial class ImplViewModel : AbstractViewModel, IMouseAware, IKeyboardAware, IFocusAware
+    public partial class ViewModelImpl : AbstractViewModel, IMouseAware
     {
         private const string DefaultProjectName = "new project.xml";
         private string _jpgPath;
@@ -22,15 +22,17 @@ namespace TranskribusPractice.ViewModels.Implementations
         private ObservableCollection<RectangleRegion> _allRegions = new ObservableCollection<RectangleRegion>();
         private ObservableCollection<TextRegion> _textRegions = new ObservableCollection<TextRegion>();
         private ObservableCollection<TextRegion> _savedTextRegions = new ObservableCollection<TextRegion>();
-        private RelayCommand _openJpgFileCommand;
-        private RelayCommand _createNewProjectCommand;
-        private RelayCommand _openProjectFileCommand;
-        private RelayCommand _saveProjectCommand;
-        private RelayCommand _saveAsProjectCommand;
-        private RelayCommand _setTextRegionModeCommand;
-        private RelayCommand _setLineRegionModeCommand;
-        private RelayCommand _setWordRegionModeCommand;
-        private RelayCommand _setSelectionModeCommand;
+        private RelayCommand<object> _openJpgFileCommand;
+        private RelayCommand<object> _createNewProjectCommand;
+        private RelayCommand<object> _openProjectFileCommand;
+        private RelayCommand<object> _saveProjectCommand;
+        private RelayCommand<object> _saveAsProjectCommand;
+        private RelayCommand<object> _setTextRegionModeCommand;
+        private RelayCommand<object> _setLineRegionModeCommand;
+        private RelayCommand<object> _setWordRegionModeCommand;
+        private RelayCommand<object> _setSelectionModeCommand;
+        private RelayCommand<object> _deleteSelectedRectangleCommand;
+        public override ICommand ClosingWindowCommand => null;
         private readonly IServiceProvider _serviceProvider = new ServiceProvider();
         public override string JpgPath
         {
@@ -73,7 +75,7 @@ namespace TranskribusPractice.ViewModels.Implementations
                 NotifyPropertyChanged();
             }
         }
-        public override bool IsFocusable 
+        public override bool IsFocusable
         {
             get => _isFocusable;
             set
@@ -106,7 +108,7 @@ namespace TranskribusPractice.ViewModels.Implementations
         public override ICommand OpenJpgFileCommand
         {
             get => _openJpgFileCommand ??
-                    (_openJpgFileCommand = new RelayCommand((o) =>
+                    (_openJpgFileCommand = new RelayCommand<object>((o) =>
                     {
                         var fileService = (IFileService)_serviceProvider.GetService(typeof(IFileService));
                         string path = fileService.OpenJpgFile();
@@ -119,27 +121,27 @@ namespace TranskribusPractice.ViewModels.Implementations
         public override ICommand CreateNewProjectCommand
         {
             get => _createNewProjectCommand ??
-                    (_createNewProjectCommand = new RelayCommand(CreateNewProjectCommandExecution));
+                    (_createNewProjectCommand = new RelayCommand<object>(CreateNewProjectCommandExecution));
         }
         public override ICommand OpenProjectFileCommand
         {
             get => _openProjectFileCommand ??
-                    (_openProjectFileCommand = new RelayCommand(OpenProjectFileCommandExecution));
+                    (_openProjectFileCommand = new RelayCommand<object>(OpenProjectFileCommandExecution));
         }
         public override ICommand SaveProjectCommand
         {
             get => _saveProjectCommand ??
-                    (_saveProjectCommand = new RelayCommand(SaveProjectCommandExecution));
+                    (_saveProjectCommand = new RelayCommand<object>(SaveProjectCommandExecution));
         }
         public override ICommand SaveAsProjectCommand
         {
             get => _saveAsProjectCommand ??
-                    (_saveAsProjectCommand = new RelayCommand(SaveAsProjectCommandExecution));
+                    (_saveAsProjectCommand = new RelayCommand<object>(SaveAsProjectCommandExecution));
         }
         public override ICommand SetTextRegionModeCommand
         {
             get => _setTextRegionModeCommand ??
-                    (_setTextRegionModeCommand = new RelayCommand((o) =>
+                    (_setTextRegionModeCommand = new RelayCommand<object>((o) =>
                     {
                         IsFocusable = false;
                         Mode = Region.Text;
@@ -148,7 +150,7 @@ namespace TranskribusPractice.ViewModels.Implementations
         public override ICommand SetLineRegionModeCommand
         {
             get => _setLineRegionModeCommand ??
-                    (_setLineRegionModeCommand = new RelayCommand((o) =>
+                    (_setLineRegionModeCommand = new RelayCommand<object>((o) =>
                     {
                         IsFocusable = false;
                         Mode = Region.Line;
@@ -157,17 +159,17 @@ namespace TranskribusPractice.ViewModels.Implementations
         public override ICommand SetWordRegionModeCommand
         {
             get => _setWordRegionModeCommand ??
-                    (_setWordRegionModeCommand = new RelayCommand((o) =>
+                    (_setWordRegionModeCommand = new RelayCommand<object>((o) =>
                     {
                         IsFocusable = false;
                         Mode = Region.Word;
-                        
+
                     }));
         }
         public override ICommand SetSelectionModeCommand
         {
             get => _setSelectionModeCommand ??
-                    (_setSelectionModeCommand = new RelayCommand((o) =>
+                    (_setSelectionModeCommand = new RelayCommand<object>((o) =>
                     {
                         IsFocusable = true;
                         Mode = Region.Undefined;
@@ -183,7 +185,7 @@ namespace TranskribusPractice.ViewModels.Implementations
                 {
                     SaveProjectCommandExecution(null);
                 }
-                else if (result == CustomMessageBoxResult.Cancel) 
+                else if (result == CustomMessageBoxResult.Cancel)
                 {
                     return;
                 }
@@ -223,7 +225,7 @@ namespace TranskribusPractice.ViewModels.Implementations
                 BuildRichTextBox();
             }
         }
-        private void SaveProjectCommandExecution(object param) 
+        private void SaveProjectCommandExecution(object param)
         {
             var projectService = (IProjectService)_serviceProvider.GetService(typeof(IProjectService));
             if ((ProjectPath != string.Empty && ProjectPath != null)
@@ -261,7 +263,7 @@ namespace TranskribusPractice.ViewModels.Implementations
                 projectService.ShowError();
             }
         }
-        private bool SaveAsProject(IProjectService projectService) 
+        private bool SaveAsProject(IProjectService projectService)
         {
             bool isSaved;
             var copiedTextRegions = CopyTextRegions();
@@ -272,7 +274,7 @@ namespace TranskribusPractice.ViewModels.Implementations
             }
             return isSaved;
         }
-        private bool IsSaved() 
+        private bool IsSaved()
         {
             if (_savedTextRegions.Count != TextRegions.Count)
             {
@@ -280,7 +282,7 @@ namespace TranskribusPractice.ViewModels.Implementations
             }
             for (int i = 0; i < _savedTextRegions.Count; i++)
             {
-                if (_savedTextRegions[i].Lines.Count != TextRegions[i].Lines.Count) 
+                if (_savedTextRegions[i].Lines.Count != TextRegions[i].Lines.Count)
                 {
                     return false;
                 }
@@ -293,7 +295,7 @@ namespace TranskribusPractice.ViewModels.Implementations
                     for (int k = 0; k < _savedTextRegions[i].Lines[j].Words.Count; k++)
                     {
                         if (_savedTextRegions[i].Lines[j].Words[k].Content
-                            != TextRegions[i].Lines[j].Words[k].Content) 
+                            != TextRegions[i].Lines[j].Words[k].Content)
                         {
                             return false;
                         }
@@ -302,7 +304,7 @@ namespace TranskribusPractice.ViewModels.Implementations
             }
             return true;
         }
-        private ObservableCollection<TextRegion> CopyTextRegions() 
+        private ObservableCollection<TextRegion> CopyTextRegions()
         {
             var textRegions = new ObservableCollection<TextRegion>();
             foreach (var text in TextRegions)
@@ -411,8 +413,15 @@ namespace TranskribusPractice.ViewModels.Implementations
             TextSelected = sbs.ToString();
             TextRight = sbr.ToString();
         }
-        public ImplViewModel() { }
-        public void DeleteSelectedRectangle()
+        public ViewModelImpl() { }
+
+        public override ICommand DeleteSelectedRectangleCommand 
+        {
+            get => _deleteSelectedRectangleCommand ??
+                  (_deleteSelectedRectangleCommand = new RelayCommand<object>(DeleteSelectedRectangleExecution));
+        }
+
+        public void DeleteSelectedRectangleExecution(object args)
         {
             if (SelectedRectangle is TextRegion tr)
             {

@@ -26,9 +26,11 @@ namespace TranskribusPractice.ViewModels
         public abstract ICommand OpenProjectFileCommand { get; }
         public abstract ICommand SaveProjectCommand { get; }
         public abstract ICommand SaveAsProjectCommand { get; }
+        public abstract ICommand ClosingWindowCommand { get; }
         public abstract ICommand SetTextRegionModeCommand { get; }
         public abstract ICommand SetLineRegionModeCommand { get; }
         public abstract ICommand SetWordRegionModeCommand { get; }
         public abstract ICommand SetSelectionModeCommand { get; }
+        public abstract ICommand DeleteSelectedRectangleCommand { get; }
     }
 }

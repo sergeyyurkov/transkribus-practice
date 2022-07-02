@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TranskribusPractice", "TranskribusPractice\TranskribusPractice.csproj", "{3945920A-ACB1-4FCE-A3F0-C4EFD487D868}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7BD57977-575B-4703-94B7-257869B0F492} = {7BD57977-575B-4703-94B7-257869B0F492}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TranskribusPractice.ViewModels", "TranskribusPractice.ViewModels\TranskribusPractice.ViewModels.csproj", "{4655AD4C-363E-461B-B782-075E58D52884}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -17,6 +20,13 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TranskribusPractice.BusinessDomain", "TranskribusPractice.BusinessDomain\TranskribusPractice.BusinessDomain.csproj", "{F82C6792-7CA9-4D36-9762-65995BFD79CC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TranskribusPractice.Services", "TranskribusPractice.Services\TranskribusPractice.Services.csproj", "{41739F26-E815-4D99-96B9-5AA2EE42D0CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TranskribusPractice.ViewModels.ImplementationNetFramework", "TranskribusPractice.ViewModels.ImplementationNetFramework\TranskribusPractice.ViewModels.ImplementationNetFramework.csproj", "{7BD57977-575B-4703-94B7-257869B0F492}"
+	ProjectSection(ProjectDependencies) = postProject
+		{41739F26-E815-4D99-96B9-5AA2EE42D0CF} = {41739F26-E815-4D99-96B9-5AA2EE42D0CF}
+		{4655AD4C-363E-461B-B782-075E58D52884} = {4655AD4C-363E-461B-B782-075E58D52884}
+		{F82C6792-7CA9-4D36-9762-65995BFD79CC} = {F82C6792-7CA9-4D36-9762-65995BFD79CC}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +58,10 @@ Global
 		{41739F26-E815-4D99-96B9-5AA2EE42D0CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{41739F26-E815-4D99-96B9-5AA2EE42D0CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{41739F26-E815-4D99-96B9-5AA2EE42D0CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BD57977-575B-4703-94B7-257869B0F492}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BD57977-575B-4703-94B7-257869B0F492}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BD57977-575B-4703-94B7-257869B0F492}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BD57977-575B-4703-94B7-257869B0F492}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

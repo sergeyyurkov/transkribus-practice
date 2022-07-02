@@ -1,8 +1,9 @@
-﻿<UserControl x:Class="TranskribusPractice.Views.ExampleView"
+﻿<UserControl x:Class="TranskribusPractice.Views.MainView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:local="clr-namespace:TranskribusPractice.Views"
              xmlns:design="clr-namespace:TranskribusPractice.Views.Design"
              xmlns:area="clr-namespace:TranskribusPractice.BusinessDomain.AreaConcept;assembly=TranskribusPractice.BusinessDomain"
@@ -114,8 +115,12 @@
                       Background="Transparent"
                       PreviewMouseDown="ImageArea_MouseDown" 
                       MouseMove="ImageArea_MouseMove" 
-                      MouseUp="ImageArea_MouseUp"
-                      KeyDown="ImageArea_KeyDown">
+                      MouseUp="ImageArea_MouseUp">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="KeyDown">
+                            <i:InvokeCommandAction Command="{Binding DeleteSelectedRectangleCommand}" PassEventArgsToCommand="True"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                     <Image Source="{Binding Path=JpgPath}"/>
                     <Canvas Background="Transparent" x:Name="CanvasRectangleArea">
                         <Rectangle x:Name="RectangleUI"                        
